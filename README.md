@@ -1,5 +1,4 @@
-# ceng-407-408-2024-2025-Skinalyzer
-Skinalyzer
+# Skinalyzer
 
 # Project Description
 This project plans to develop an advanced system for detecting skin cancer by analyzing lesion images, utilizing the ISIC 2019 and HAM10000 datasets. These datasets encompass various skin lesion images, ensuring a comprehensive representation of different skin cancer types, which is crucial for training a robust and accurate model.
