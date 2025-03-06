@@ -34,7 +34,7 @@ def aggregate_evaluate_metrics(metrics_list):
     accuracies = []
     f1_scores = []
 
-    print("📊 Gelen Metrikler:", metrics_list)
+    print(" Gelen Metrikler:", metrics_list)
 
     for _, m in metrics_list:
         if "accuracy" in m:
@@ -45,9 +45,9 @@ def aggregate_evaluate_metrics(metrics_list):
     avg_accuracy = sum(accuracies) / len(accuracies) if accuracies else 0.0
     avg_f1_score = sum(f1_scores) / len(f1_scores) if f1_scores else 0.0
 
-    print("\n🌟 Global Model Evaluation 🌟")
-    print(f"✅ Average Accuracy: {avg_accuracy:.4f}")
-    print(f"✅ Average F1-Score: {avg_f1_score:.4f}\n")
+    print("\n Global Model Evaluation ")
+    print(f" Average Accuracy: {avg_accuracy:.4f}")
+    print(f" Average F1-Score: {avg_f1_score:.4f}\n")
 
     return {"accuracy": avg_accuracy, "f1_score": avg_f1_score}
 
@@ -60,7 +60,7 @@ strategy = FedAvg(
 )
 
 if __name__ == "__main__":
-    print("🚀 Federated Learning Server Başlatılıyor...\n")
+    print(" Federated Learning Server Başlatılıyor...\n")
     fl.server.start_server(
         server_address="0.0.0.0:8080",
         config=fl.server.ServerConfig(num_rounds=5),
