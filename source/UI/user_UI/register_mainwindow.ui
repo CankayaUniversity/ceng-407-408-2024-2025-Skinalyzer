@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1019</width>
+    <height>679</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(248, 235, 244);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>0</y>
+      <width>291</width>
+      <height>651</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QColumnView" name="columnView_2">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(157, 81, 113);</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QColumnView" name="columnView">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(219, 126, 166);</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>30</y>
+      <width>501</width>
+      <height>601</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="leftMargin">
+      <number>20</number>
+     </property>
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>20</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Please Fill out form to Register!</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Full name:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="fullName">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	color: rgb(0, 0, 0); 
+	background-color: rgb(255, 255, 255);
+	font: 9pt &quot;Segoe UI&quot;;
+    border: 1px solid #9D5171; /* Kenar rengi olarak #9D5171 kullan */
+    border-radius: 5px; /* Kenarları yuvarlatmak için (isteğe bağlı) */
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Username:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="userName">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	color: rgb(0, 0, 0); 
+	background-color: rgb(255, 255, 255);
+	font: 9pt &quot;Segoe UI&quot;;
+    border: 1px solid #9D5171; /* Kenar rengi olarak #9D5171 kullan */
+    border-radius: 5px; /* Kenarları yuvarlatmak için (isteğe bağlı) */
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Email/Phone number:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="r_email">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	color: rgb(0, 0, 0); 
+	background-color: rgb(255, 255, 255);
+	font: 9pt &quot;Segoe UI&quot;;
+    border: 1px solid #9D5171; /* Kenar rengi olarak #9D5171 kullan */
+    border-radius: 5px; /* Kenarları yuvarlatmak için (isteğe bağlı) */
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Password:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="password">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	color: rgb(0, 0, 0); 
+	background-color: rgb(255, 255, 255);
+	font: 9pt &quot;Segoe UI&quot;;
+    border: 1px solid #9D5171; /* Kenar rengi olarak #9D5171 kullan */
+    border-radius: 5px; /* Kenarları yuvarlatmak için (isteğe bağlı) */
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Confirm Password:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="confirm_pass">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	color: rgb(0, 0, 0); 
+	background-color: rgb(255, 255, 255);
+	font: 9pt &quot;Segoe UI&quot;;
+    border: 1px solid #9D5171; /* Kenar rengi olarak #9D5171 kullan */
+    border-radius: 5px; /* Kenarları yuvarlatmak için (isteğe bağlı) */
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Select Your skin color:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="skinColor">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	color: rgb(0, 0, 0); 
+	background-color: rgb(255, 255, 255);
+	font: 9pt &quot;Segoe UI&quot;;
+    border: 1px solid #9D5171; /* Kenar rengi olarak #9D5171 kullan */
+    border-radius: 5px; /* Kenarları yuvarlatmak için (isteğe bağlı) */
+}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(34, 34, 34);</string>
+       </property>
+       <property name="text">
+        <string> Yes i have an account? Login </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="registerButton">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(157, 81, 113);</string>
+       </property>
+       <property name="text">
+        <string>Register</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

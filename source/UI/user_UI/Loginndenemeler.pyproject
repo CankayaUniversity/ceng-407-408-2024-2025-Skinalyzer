@@ -1,0 +1,10 @@
+{
+    "files": [
+        "mainwindow.py",
+        "mainwindow.ui",
+        "register_mainwindow.ui",
+        "registermain.py",
+        "ui_mainwindow.py",
+        "ui_register_mainwindow.py"
+    ]
+}
