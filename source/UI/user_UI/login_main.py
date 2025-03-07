@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
-from ui_mainwindow import Ui_MainWindow
+from ui_login_mainwindow import Ui_MainWindow
 from registermain import RegisterWindow  # Register penceresini içe aktar
 
 class MainWindow(QMainWindow):
