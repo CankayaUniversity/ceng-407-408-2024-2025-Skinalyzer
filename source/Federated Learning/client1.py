@@ -81,9 +81,9 @@ def load_images(df):
 
 def preprocess_ham10000(client_id=0, total_clients=3):
 
-    metadata_path = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_metadata.csv"
-    folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
-    folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+    metadata_path = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_metadata.csv"
+    folder1 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_1"
+    folder2 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_2"
 
     metadata = pd.read_csv(metadata_path)
     metadata["image_path"] = metadata["image_id"].apply(lambda x: get_image_path(x, folder1, folder2))
@@ -155,8 +155,8 @@ class HAM10000Client(fl.client.NumPyClient):
         self.model.set_weights(parameters)
 
         callbacks = [
-            EarlyStopping(monitor="loss", patience=3, restore_best_weights=True),
-            ReduceLROnPlateau(monitor="loss", factor=0.5, patience=2, verbose=1)
+            EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True),
+            ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2, verbose=1)
         ]
 
         history = self.model.fit(
@@ -201,7 +201,7 @@ if __name__ == "__main__":
                             f"Client-{args.client_id}")
 
     fl.client.start_numpy_client(
-        server_address="127.0.0.1:8080",  # localhost olarak ayarlandı
+        server_address="192.168.1.109:8080",  # localhost olarak ayarlandı
         client=client
     )
 
