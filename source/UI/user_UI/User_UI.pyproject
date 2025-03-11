@@ -1,10 +1,14 @@
 {
     "files": [
-        "mainwindow.py",
-        "mainwindow.ui",
+        "User_UI.pyproject.user",
+        "login_main.py",
+        "login_mainwindow.ui",
         "register_mainwindow.ui",
         "registermain.py",
-        "ui_mainwindow.py",
-        "ui_register_mainwindow.py"
+        "ui_login_mainwindow.py",
+        "ui_register_mainwindow.py",
+        "ui_user.py",
+        "user.py",
+        "user.ui"
     ]
 }

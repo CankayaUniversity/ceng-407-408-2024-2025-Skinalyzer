@@ -33,10 +33,10 @@ def load_images(df):
             labels.append(label)
     return np.array(images), to_categorical(np.array(labels), num_classes=7)
 
-def preprocess_ham10000(client_id=1, total_clients=3):
-    metadata_path = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_metadata.csv"
-    folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
-    folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+def preprocess_ham10000(client_id=2, total_clients=3):
+    metadata_path = "C:/Users/user/OneDrive/Masaüstü/ham10000_dataset/HAM10000_metadata.csv"
+    folder1 = "C:/Users/user/OneDrive/Masaüstü/ham10000_dataset/HAM10000_images_part_1"
+    folder2 = "C:/Users/user/OneDrive/Masaüstü/ham10000_dataset/HAM10000_images_part_2"
 
     # Metadata’yı oku ve görüntü yollarını ekle
     metadata = pd.read_csv(metadata_path)
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     client = HAM10000Client(model, (train_data, train_labels), (test_data, test_labels), f"Client-{args.client_id}")
 
     fl.client.start_numpy_client(
-        server_address="192.168.1.110:8080",
+        server_address="192.168.1.109:8080",
         client=client
     )
 

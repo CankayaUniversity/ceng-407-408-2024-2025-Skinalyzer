@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
     def open_register_window(self, event):
         self.register_window = RegisterWindow()  # Yeni bir RegisterWindow nesnesi oluştur
         self.register_window.show()  # Pencereyi göster
-        self.close()  # Login penceresini kapat (isteğe bağlı)
+        self.close()  # Login penceresini kapat 
 
 if __name__ == "__main__":
     app = QApplication([])

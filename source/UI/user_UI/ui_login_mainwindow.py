@@ -22,6 +22,7 @@ class Ui_MainWindow(object):
         self.widget.setObjectName(u"widget")
         self.widget.setStyleSheet(u"background-color: rgb(255, 255, 255); padding: 20px;")  # Padding ekleyerek içeriği biraz daha kenardan uzaklaştırıyoruz
         self.widget.setFixedWidth(400)  # Genişliği sabitle
+        self.widget.setFixedHeight(600)
         outer_layout.addWidget(self.widget)
 
         # İç Layout (ortadaki widget'ın içindeki widget'ları yerleştirecek)

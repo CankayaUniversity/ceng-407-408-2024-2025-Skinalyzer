@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QColumnView, QHBoxLayout, QLabel,
     QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QStatusBar, QVBoxLayout, QWidget, QMessageBox)
+    QStatusBar, QVBoxLayout, QWidget, QMessageBox, QSpacerItem, QSizePolicy)
 
 class Ui_RegisterWindow(object):
     def setupUi(self, MainWindow):
@@ -27,17 +27,29 @@ class Ui_RegisterWindow(object):
         
         # Left Column (decorative part)
         self.columnView_2 = QColumnView(self.horizontalLayoutWidget)
+        spacer = QSpacerItem(50, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.main_layout.addItem(spacer) 
         self.columnView_2.setObjectName(u"columnView_2")
         self.columnView_2.setStyleSheet(u"background-color: rgb(157, 81, 113);")
-        self.horizontalLayout.addWidget(self.columnView_2)
-
+        self.horizontalLayout.addWidget(self.columnView_2, 1)
+        self.columnView_2.setMinimumHeight(200)
+        self.columnView_2.setMaximumHeight(1000)
+        
+        
         # Right Column (form part)
         self.columnView = QColumnView(self.horizontalLayoutWidget)
+        
         self.columnView.setObjectName(u"columnView")
         self.columnView.setStyleSheet(u"background-color: rgb(219, 126, 166);")
-        self.horizontalLayout.addWidget(self.columnView)
+        self.horizontalLayout.addWidget(self.columnView, 1)
+        self.columnView.setMinimumHeight(200)
+        self.columnView.setMaximumHeight(1000)
 
-        # Create form layout, make it a part of the right column (beside the decorative part)
+       
+
+
+       
+       
         self.widget = QWidget(self.centralwidget)
         self.widget.setObjectName(u"widget")
         self.widget.setGeometry(460, 30, 501, 601)
@@ -45,6 +57,8 @@ class Ui_RegisterWindow(object):
         self.verticalLayout.setSpacing(7)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(20, 10, 20, 10)
+        
+
 
         self.label = QLabel(self.widget)
         self.label.setObjectName(u"label")
@@ -157,11 +171,17 @@ class Ui_RegisterWindow(object):
         self.registerButton.setStyleSheet(u"background-color: rgb(157, 81, 113);")
         self.verticalLayout.addWidget(self.registerButton)
 
-        # Add event to register button
+       
         self.registerButton.clicked.connect(self.on_register)
 
-        self.main_layout.addWidget(self.horizontalLayoutWidget)
-        self.main_layout.addWidget(self.widget)
+        self.main_layout.addWidget(self.horizontalLayoutWidget, 1)
+        spacer = QSpacerItem(150, 50, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.main_layout.addItem(spacer)  
+
+        self.main_layout.addWidget(self.widget, 2)
+        spacer_right = QSpacerItem(100, 50, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.main_layout.addItem(spacer_right)  
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.statusbar = QStatusBar(MainWindow)
