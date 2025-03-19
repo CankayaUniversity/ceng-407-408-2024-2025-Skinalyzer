@@ -82,10 +82,10 @@ def load_images(df):
 
 
 def preprocess_ham10000(client_id=0, total_clients=3):
+
     metadata_path = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_metadata.csv"
     folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
     folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
-
     metadata = pd.read_csv(metadata_path)
     metadata["image_path"] = metadata["image_id"].apply(lambda x: get_image_path(x, folder1, folder2))
 
