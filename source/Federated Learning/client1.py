@@ -8,12 +8,14 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array, ImageDa
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 import flwr as fl
 import argparse
 from collections import Counter
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.models import Model
+from tensorflow.keras.metrics import Recall
 
 
 def augment_minority_classes(images, labels):
@@ -84,7 +86,6 @@ def preprocess_ham10000(client_id=0, total_clients=3):
     metadata_path = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_metadata.csv"
     folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
     folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
-
     metadata = pd.read_csv(metadata_path)
     metadata["image_path"] = metadata["image_id"].apply(lambda x: get_image_path(x, folder1, folder2))
 
@@ -110,13 +111,26 @@ def preprocess_ham10000(client_id=0, total_clients=3):
     test_data, test_labels = load_images(test_metadata)
 
     print("Veri artırma uygulanıyor...")
-    augmented_data, augmented_labels = augment_minority_classes(train_data, train_labels)
 
-    # Orijinal verilerle birleştir
+    augmented_data, augmented_labels = augment_minority_classes(train_data, train_labels)
     train_data = np.concatenate((train_data, augmented_data), axis=0)
     train_labels = np.concatenate((train_labels, augmented_labels), axis=0)
 
-    print("Yeni sınıf dağılımı:", Counter(np.argmax(train_labels, axis=1)))
+    #  Validation seti için gerçek zamanlı augmentation
+    val_datagen = ImageDataGenerator(
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode="nearest"
+    )
+
+    val_generator = val_datagen.flow(val_data, val_labels, batch_size=16, shuffle=False)
+
+    print("Yeni eğitim sınıf dağılımı:", Counter(np.argmax(train_labels, axis=1)))
+
     return (train_data, train_labels), (val_data, val_labels), (test_data, test_labels)
 
 
@@ -135,8 +149,10 @@ def create_client_model():
 
     model = Model(inputs=base_model.input, outputs=output_layer)
 
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss="categorical_crossentropy", metrics=["accuracy"])
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss="categorical_crossentropy",
+                  metrics=["accuracy"])
     return model
+
 
 class HAM10000Client(fl.client.NumPyClient):
     def __init__(self, model, train_data, val_data, test_data, cid):
@@ -155,8 +171,8 @@ class HAM10000Client(fl.client.NumPyClient):
         self.model.set_weights(parameters)
 
         callbacks = [
-            EarlyStopping(monitor="loss", patience=3, restore_best_weights=True),
-            ReduceLROnPlateau(monitor="loss", factor=0.5, patience=2, verbose=1)
+            EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True),
+            ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2, verbose=1)
         ]
 
         history = self.model.fit(
@@ -170,21 +186,32 @@ class HAM10000Client(fl.client.NumPyClient):
         )
 
         print(f"Client {self.cid}: Eğitim tamamlandı.")
-        for i, (acc, val_acc) in enumerate(zip(history.history["accuracy"], history.history["val_accuracy"])):
-            print(f"Epoch {i + 1} - accuracy: {acc:.4f}, validation accuracy: {val_acc:.4f}")
+        for i, (rec, val_rec) in enumerate(zip(history.history["accuracy"], history.history["val_accuracy"])):
+            print(f"Epoch {i + 1} - accuracy: {rec:.4f}, validation accuracy: {val_rec:.4f}")
         return self.model.get_weights(), len(self.train_data[0]), {}
 
     def evaluate(self, parameters, config):
         print(f"Client {self.cid}: Değerlendirme yapılıyor...")
         self.model.set_weights(parameters)
+        # Modelin genel loss ve accuracy değerlerini hesaplayın
         loss, accuracy = self.model.evaluate(self.test_data[0], self.test_data[1], verbose=0)
-        print(f"Değerlendirme tamamlandı: Loss={loss:.4f}, Accuracy={accuracy:.4f}")
+
+        # Test verileri üzerinde tahminleri hesaplayın
+        predictions = self.model.predict(self.test_data[0])
+        y_pred = np.argmax(predictions, axis=1)
+        y_true = np.argmax(self.test_data[1], axis=1)
+
+        # Classification report oluşturun ve yazdırın
+        report = classification_report(y_true, y_pred, digits=4)
+        print("Classification Report:\n", report)
+
+        print(f"Değerlendirme tamamlandı: Loss={loss:.4f}, accuracy={accuracy:.4f}")
         return loss, len(self.test_data[0]), {"accuracy": accuracy}
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--client-id", type=int, default=0, help="Client ID (0, 1 veya 2)")
+    parser.add_argument("--client-id", type=int, default=1, help="Client ID (0, 1 veya 2)")
     parser.add_argument("--model", type=str, default="mobilenet",
                         help="Kullanılacak model tipi: mobilenet, densenet, resnet, vgg, inception")
     args = parser.parse_args()
@@ -201,7 +228,7 @@ if __name__ == "__main__":
                             f"Client-{args.client_id}")
 
     fl.client.start_numpy_client(
-        server_address="127.0.0.1:8080",  # localhost olarak ayarlandı
+        server_address="127.0.0.1:8080",
         client=client
     )
 
