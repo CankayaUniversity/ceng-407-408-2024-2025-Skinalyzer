@@ -1,9 +1,89 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QColumnView, QHBoxLayout, QLabel,
-    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QStatusBar, QVBoxLayout, QWidget, QMessageBox, QSpacerItem, QSizePolicy)
+    QLineEdit, QMainWindow, QPushButton, QSizePolicy, QStatusBar,
+    QVBoxLayout, QWidget, QMessageBox, QSpacerItem)
+import mysql.connector
+import bcrypt
+import uuid
 
 class Ui_RegisterWindow(object):
+    def on_register(self):
+        full_name = self.fullName.text().strip()
+        user_name = self.userName.text().strip()
+        email = self.r_email.text().strip()  
+        password = self.password.text().strip()
+        confirm_password = self.confirm_pass.text().strip()
+        skin_color = self.skinColor.text().strip()
+
+        if not full_name or not user_name or not email or not password or not confirm_password:
+            self.show_error("Please fill in all fields!")
+            return
+
+        if password != confirm_password:
+            self.show_error("Passwords do not match!")
+            return
+
+       
+        if "@" not in email:
+            if not email.isdigit():
+                self.show_error("The phone number must consist of numbers only!")
+                return
+
+        try:
+            conn = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="Tprksu.001",
+                database="user_database"
+            )
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT Email FROM user WHERE Email = %s", (email,))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                self.show_error("This email or phone number is already registered!")
+                cursor.close()
+                conn.close()
+                return
+
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
+
+            insert_query = """
+            INSERT INTO user (UserID, Name, Email, Password, Role, DateJoined, SkinColor)
+            VALUES (%s, %s, %s, %s, %s, CURDATE(), %s)
+            """
+            user_id = f"USR{int.from_bytes(email.encode(), 'little') % 100000}"  
+            cursor.execute(insert_query, (user_id, full_name, email, hashed_password, "user", skin_color))
+            print(f"Number of rows affected: {cursor.rowcount}")
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                self.show_success("Registration successful! You can now log in.")
+            else:
+                self.show_error("Registration failed! Please try again.")
+
+        except mysql.connector.Error as e:
+            self.show_error(f"Database error: {e}")
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+    def show_error(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText(message)
+        msg.setWindowTitle("Error")
+        msg.exec()
+
+    def show_success(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText(message)
+        msg.setWindowTitle("Successful")
+        msg.exec()
+
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
@@ -13,9 +93,8 @@ class Ui_RegisterWindow(object):
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         
-        # Create a main horizontal layout
         self.main_layout = QHBoxLayout(self.centralwidget)
-        self.main_layout.setAlignment(Qt.AlignCenter)  # Center content inside
+        self.main_layout.setAlignment(Qt.AlignCenter) 
 
         self.horizontalLayoutWidget = QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
@@ -24,8 +103,7 @@ class Ui_RegisterWindow(object):
         self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        
-        # Left Column (decorative part)
+
         self.columnView_2 = QColumnView(self.horizontalLayoutWidget)
         spacer = QSpacerItem(50, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.main_layout.addItem(spacer) 
@@ -35,21 +113,13 @@ class Ui_RegisterWindow(object):
         self.columnView_2.setMinimumHeight(200)
         self.columnView_2.setMaximumHeight(1000)
         
-        
-        # Right Column (form part)
         self.columnView = QColumnView(self.horizontalLayoutWidget)
-        
         self.columnView.setObjectName(u"columnView")
         self.columnView.setStyleSheet(u"background-color: rgb(219, 126, 166);")
         self.horizontalLayout.addWidget(self.columnView, 1)
         self.columnView.setMinimumHeight(200)
-        self.columnView.setMaximumHeight(1000)
+        self.columnView.setMaximumHeight(1000)   
 
-       
-
-
-       
-       
         self.widget = QWidget(self.centralwidget)
         self.widget.setObjectName(u"widget")
         self.widget.setGeometry(460, 30, 501, 601)
@@ -57,8 +127,6 @@ class Ui_RegisterWindow(object):
         self.verticalLayout.setSpacing(7)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(20, 10, 20, 10)
-        
-
 
         self.label = QLabel(self.widget)
         self.label.setObjectName(u"label")
@@ -72,13 +140,7 @@ class Ui_RegisterWindow(object):
 
         self.fullName = QLineEdit(self.widget)
         self.fullName.setObjectName(u"fullName")
-        self.fullName.setStyleSheet(u"QLineEdit {\n"
-"    color: rgb(0, 0, 0); \n"
-"    background-color: rgb(255, 255, 255);\n"
-"    font: 9pt \"Segoe UI\";\n"
-"    border: 1px solid #9D5171;\n"
-"    border-radius: 5px;\n"
-"}")
+        self.fullName.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
         self.verticalLayout.addWidget(self.fullName)
 
         self.label_3 = QLabel(self.widget)
@@ -88,13 +150,7 @@ class Ui_RegisterWindow(object):
 
         self.userName = QLineEdit(self.widget)
         self.userName.setObjectName(u"userName")
-        self.userName.setStyleSheet(u"QLineEdit {\n"
-"    color: rgb(0, 0, 0); \n"
-"    background-color: rgb(255, 255, 255);\n"
-"    font: 9pt \"Segoe UI\";\n"
-"    border: 1px solid #9D5171;\n"
-"    border-radius: 5px;\n"
-"}")
+        self.userName.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
         self.verticalLayout.addWidget(self.userName)
 
         self.label_4 = QLabel(self.widget)
@@ -104,13 +160,7 @@ class Ui_RegisterWindow(object):
 
         self.r_email = QLineEdit(self.widget)
         self.r_email.setObjectName(u"r_email")
-        self.r_email.setStyleSheet(u"QLineEdit {\n"
-"    color: rgb(0, 0, 0); \n"
-"    background-color: rgb(255, 255, 255);\n"
-"    font: 9pt \"Segoe UI\";\n"
-"    border: 1px solid #9D5171;\n"
-"    border-radius: 5px;\n"
-"}")
+        self.r_email.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
         self.verticalLayout.addWidget(self.r_email)
 
         self.label_5 = QLabel(self.widget)
@@ -120,13 +170,7 @@ class Ui_RegisterWindow(object):
 
         self.password = QLineEdit(self.widget)
         self.password.setObjectName(u"password")
-        self.password.setStyleSheet(u"QLineEdit {\n"
-"    color: rgb(0, 0, 0); \n"
-"    background-color: rgb(255, 255, 255);\n"
-"    font: 9pt \"Segoe UI\";\n"
-"    border: 1px solid #9D5171;\n"
-"    border-radius: 5px;\n"
-"}")
+        self.password.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
         self.verticalLayout.addWidget(self.password)
 
         self.label_6 = QLabel(self.widget)
@@ -136,13 +180,7 @@ class Ui_RegisterWindow(object):
 
         self.confirm_pass = QLineEdit(self.widget)
         self.confirm_pass.setObjectName(u"confirm_pass")
-        self.confirm_pass.setStyleSheet(u"QLineEdit {\n"
-"    color: rgb(0, 0, 0); \n"
-"    background-color: rgb(255, 255, 255);\n"
-"    font: 9pt \"Segoe UI\";\n"
-"    border: 1px solid #9D5171;\n"
-"    border-radius: 5px;\n"
-"}")
+        self.confirm_pass.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
         self.verticalLayout.addWidget(self.confirm_pass)
 
         self.label_7 = QLabel(self.widget)
@@ -152,13 +190,7 @@ class Ui_RegisterWindow(object):
 
         self.skinColor = QLineEdit(self.widget)
         self.skinColor.setObjectName(u"skinColor")
-        self.skinColor.setStyleSheet(u"QLineEdit {\n"
-"    color: rgb(0, 0, 0); \n"
-"    background-color: rgb(255, 255, 255);\n"
-"    font: 9pt \"Segoe UI\";\n"
-"    border: 1px solid #9D5171;\n"
-"    border-radius: 5px;\n"
-"}")
+        self.skinColor.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
         self.verticalLayout.addWidget(self.skinColor)
 
         self.label_8 = QLabel(self.widget)
@@ -170,14 +202,12 @@ class Ui_RegisterWindow(object):
         self.registerButton.setObjectName(u"registerButton")
         self.registerButton.setStyleSheet(u"background-color: rgb(157, 81, 113);")
         self.verticalLayout.addWidget(self.registerButton)
-
        
         self.registerButton.clicked.connect(self.on_register)
 
         self.main_layout.addWidget(self.horizontalLayoutWidget, 1)
         spacer = QSpacerItem(150, 50, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.main_layout.addItem(spacer)  
-
         self.main_layout.addWidget(self.widget, 2)
         spacer_right = QSpacerItem(100, 50, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.main_layout.addItem(spacer_right)  
@@ -201,23 +231,3 @@ class Ui_RegisterWindow(object):
         self.label_7.setText("Select Your skin color:")
         self.label_8.setText("Yes I have an account? Login")
         self.registerButton.setText("Register")
-
-    def on_register(self):
-        full_name = self.fullName.text()
-        user_name = self.userName.text()
-        email = self.r_email.text()
-        password = self.password.text()
-        confirm_password = self.confirm_pass.text()
-
-        if password != confirm_password:
-            self.show_error("Passwords do not match!")
-            return
-
-        self.show_error("Registration successful!")
-
-    def show_error(self, message):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Warning)
-        msg.setText(message)
-        msg.setWindowTitle("Error")
-        msg.exec()

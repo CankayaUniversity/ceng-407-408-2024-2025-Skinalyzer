@@ -9,6 +9,8 @@ from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import Recall
+import tensorflow_addons as tfa
 
 def create_initial_model():
     base_model = ResNet50(weights="imagenet", include_top=False, input_shape=(128, 128, 3))
@@ -28,32 +30,36 @@ def create_initial_model():
     model = Model(inputs=base_model.input, outputs=output_layer)
 
     # Modeli derle
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss="categorical_crossentropy", metrics=["accuracy"])
+    model.compile(
+        optimizer=Adam(learning_rate=0.0001),
+        loss="categorical_crossentropy",
+        metrics=[tfa.metrics.F1Score(num_classes=7, average="macro", name = "f1_score", from_logits=False ), tf.keras.metrics.Recall(name="recall")]
+    )
     return model
 
 initial_model = create_initial_model()
 initial_parameters = [np.array(layer) for layer in initial_model.get_weights()]
 
 def aggregate_evaluate_metrics(metrics_list):
-    accuracies = []
+    recalls = []
     f1_scores = []
 
-    print("📊 Gelen Metrikler:", metrics_list)
+    print(" Gelen Metrikler:", metrics_list)
 
     for _, m in metrics_list:
-        if "accuracy" in m:
-            accuracies.append(m["accuracy"])
+        if "recall" in m:
+            recalls.append(m["recall"])
         if "f1_score" in m:
             f1_scores.append(m["f1_score"])
 
-    avg_accuracy = sum(accuracies) / len(accuracies) if accuracies else 0.0
+    avg_recall = sum(recalls) / len(recalls) if recalls else 0.0
     avg_f1_score = sum(f1_scores) / len(f1_scores) if f1_scores else 0.0
 
-    print("\n🌟 Global Model Evaluation 🌟")
-    print(f"✅ Average Accuracy: {avg_accuracy:.4f}")
-    print(f"✅ Average F1-Score: {avg_f1_score:.4f}\n")
+    print("\n Global Model Evaluation ")
+    print(f" Average Recall: {avg_recall:.4f}")
+    print(f" Average F1-Score: {avg_f1_score:.4f}\n")
 
-    return {"accuracy": avg_accuracy, "f1_score": avg_f1_score}
+    return {"recall": avg_recall, "f1_score": avg_f1_score}
 
 strategy = FedAvg(
     min_fit_clients=1,
