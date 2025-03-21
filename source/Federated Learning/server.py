@@ -33,7 +33,10 @@ def create_initial_model():
     model.compile(
         optimizer=Adam(learning_rate=0.0001),
         loss="categorical_crossentropy",
-        metrics=[tfa.metrics.F1Score(num_classes=7, average="macro", name = "f1_score", from_logits=False ), tf.keras.metrics.Recall(name="recall")]
+        metrics=[
+            tfa.metrics.F1Score(num_classes=7, average="macro", name="f1_score"),
+            tf.keras.metrics.CategoricalAccuracy(name="accuracy")
+        ]
     )
     return model
 
@@ -41,25 +44,25 @@ initial_model = create_initial_model()
 initial_parameters = [np.array(layer) for layer in initial_model.get_weights()]
 
 def aggregate_evaluate_metrics(metrics_list):
-    recalls = []
+    accuracies = []
     f1_scores = []
 
     print(" Gelen Metrikler:", metrics_list)
 
     for _, m in metrics_list:
-        if "recall" in m:
-            recalls.append(m["recall"])
+        if "accuracy" in m:
+            accuracies.append(m["accuracy"])
         if "f1_score" in m:
             f1_scores.append(m["f1_score"])
 
-    avg_recall = sum(recalls) / len(recalls) if recalls else 0.0
+    avg_accuracy = sum(accuracies) / len(accuracies) if accuracies else 0.0
     avg_f1_score = sum(f1_scores) / len(f1_scores) if f1_scores else 0.0
 
     print("\n Global Model Evaluation ")
-    print(f" Average Recall: {avg_recall:.4f}")
+    print(f" Average Accuracy: {avg_accuracy:.4f}")
     print(f" Average F1-Score: {avg_f1_score:.4f}\n")
 
-    return {"recall": avg_recall, "f1_score": avg_f1_score}
+    return {"accuracy": avg_accuracy, "f1_score": avg_f1_score}
 
 strategy = FedAvg(
     min_fit_clients=1,
@@ -73,6 +76,6 @@ if __name__ == "__main__":
     print("🚀 Federated Learning Server Başlatılıyor...\n")
     fl.server.start_server(
         server_address="127.0.0.1:8080",
-        config=fl.server.ServerConfig(num_rounds=10),
+        config=fl.server.ServerConfig(num_rounds=5),
         strategy=strategy
     )
