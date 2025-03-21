@@ -221,12 +221,12 @@ class Ui_MainWindow(object):
         email = self.email.text()
         password = self.password.text()
 
-<<<<<<< HEAD
+
         if email == "test@example.com" and password == "12345":
             self.messageLabel.setText("Login successful!")
             self.switch_to_main_page()
             
-=======
+
        
         conn = mysql.connector.connect(
             host="localhost",
@@ -258,11 +258,11 @@ class Ui_MainWindow(object):
             else:
                 self.messageLabel.setText(" Invalid password format!")
                 self.messageLabel.setStyleSheet("color: red;")
->>>>>>> 3a0c96957a8ed5982cba6bf815a78d82ed884cb8
+
         else:
             self.messageLabel.setText(" User not found!")
             self.messageLabel.setStyleSheet("color: red;")
-<<<<<<< HEAD
+
 
     def switch_to_main_page(self):
         # UserWidget (ana sayfa) widget'ını oluştur
@@ -274,6 +274,6 @@ class Ui_MainWindow(object):
         # UserWidget (ana sayfa) widget'ını göster
         self.centralwidget.layout().addWidget(self.main_widget)
         self.main_widget.show()
-=======
+
          
->>>>>>> 3a0c96957a8ed5982cba6bf815a78d82ed884cb8
+
