@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
 from ui_login_mainwindow import Ui_MainWindow
-from registermain import RegisterWindow  # Register penceresini içe aktar
+from registermain import RegisterWindow 
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -9,13 +9,12 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
-        # Register penceresini açmak için
-        self.ui.label_4.mousePressEvent = self.open_register_window  # Tıklama olayını yakala
-
+        
+        self.ui.label_4.mousePressEvent = self.open_register_window 
     def open_register_window(self, event):
-        self.register_window = RegisterWindow()  # Yeni bir RegisterWindow nesnesi oluştur
-        self.register_window.show()  # Pencereyi göster
-        self.close()  # Login penceresini kapat 
+        self.register_window = RegisterWindow()  
+        self.register_window.show()  
+        self.close()   
 
 if __name__ == "__main__":
     app = QApplication([])
