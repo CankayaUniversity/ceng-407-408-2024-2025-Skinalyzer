@@ -1,5 +1,7 @@
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtWidgets import QApplication, QHBoxLayout ,QLabel, QLineEdit, QMainWindow, QPushButton, QStatusBar, QWidget, QVBoxLayout, QSpacerItem, QSizePolicy
+from ui_user import Ui_Widget
+from user import UserWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -145,7 +147,19 @@ class Ui_MainWindow(object):
 
         if email == "test@example.com" and password == "12345":
             self.messageLabel.setText("Login successful!")
-            self.messageLabel.setStyleSheet("color: green;")
+            self.switch_to_main_page()
+            
         else:
             self.messageLabel.setText("Invalid email or password!")
             self.messageLabel.setStyleSheet("color: red;")
+
+    def switch_to_main_page(self):
+        # UserWidget (ana sayfa) widget'ını oluştur
+        self.main_widget = UserWidget()
+
+        # Login widget'ını gizle
+        self.widget.hide()
+
+        # UserWidget (ana sayfa) widget'ını göster
+        self.centralwidget.layout().addWidget(self.main_widget)
+        self.main_widget.show()
