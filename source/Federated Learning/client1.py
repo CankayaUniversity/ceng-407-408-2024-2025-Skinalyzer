@@ -16,6 +16,7 @@ from collections import Counter
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.models import Model
 from tensorflow.keras.metrics import Recall
+from sklearn.utils.class_weight import compute_class_weight
 
 
 def augment_minority_classes(images, labels):
@@ -83,9 +84,9 @@ def load_images(df):
 
 def preprocess_ham10000(client_id=0, total_clients=3):
 
-    metadata_path = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_metadata.csv"
-    folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
-    folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+    metadata_path = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_metadata.csv"
+    folder1 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_1"
+    folder2 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_2"
     metadata = pd.read_csv(metadata_path)
     metadata["image_path"] = metadata["image_id"].apply(lambda x: get_image_path(x, folder1, folder2))
 
@@ -170,6 +171,13 @@ class HAM10000Client(fl.client.NumPyClient):
         print(f"Client {self.cid}: Eğitim başlatılıyor...")
         self.model.set_weights(parameters)
 
+        # Sınıf ağırlıklarını hesapla
+        train_labels_arg = np.argmax(self.train_data[1], axis=1)
+        classes = np.unique(train_labels_arg)
+        class_weights = compute_class_weight(class_weight="balanced", classes=classes, y=train_labels_arg)
+        class_weight_dict = dict(zip(classes, class_weights))
+        print("Hesaplanan sınıf ağırlıkları:", class_weight_dict)
+
         callbacks = [
             EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True),
             ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2, verbose=1)
@@ -182,6 +190,7 @@ class HAM10000Client(fl.client.NumPyClient):
             epochs=20,
             batch_size=16,
             callbacks=callbacks,
+            class_weight=class_weight_dict,  # Sınıf ağırlıkları burada ekleniyor
             verbose=1,
         )
 
@@ -211,7 +220,7 @@ class HAM10000Client(fl.client.NumPyClient):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--client-id", type=int, default=1, help="Client ID (0, 1 veya 2)")
+    parser.add_argument("--client-id", type=int, default=0, help="Client ID (0, 1 veya 2)")
     parser.add_argument("--model", type=str, default="mobilenet",
                         help="Kullanılacak model tipi: mobilenet, densenet, resnet, vgg, inception")
     args = parser.parse_args()
