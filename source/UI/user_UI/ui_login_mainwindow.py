@@ -1,13 +1,9 @@
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtWidgets import QApplication, QHBoxLayout ,QLabel, QLineEdit, QMainWindow, QPushButton, QStatusBar, QWidget, QVBoxLayout, QSpacerItem, QSizePolicy
-
-from ui_user import Ui_Widget
-from user import UserWidget
-
 import mysql.connector
+from ui_user import SkinalyzerUI 
 import bcrypt
 from registermain import RegisterWindow
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -61,7 +57,7 @@ class Ui_MainWindow(object):
                                  "}")
        
         self.email.setFixedWidth(350)
-        self.email.setFixedHeight(50)
+        self.email.setFixedHeight(55)
         email_layout = QHBoxLayout()
         email_layout.setAlignment(Qt.AlignCenter)  
         email_layout.addWidget(self.email)
@@ -87,7 +83,7 @@ class Ui_MainWindow(object):
                                     "}")
         
         self.password.setFixedWidth(350)
-        self.password.setFixedHeight(50)
+        self.password.setFixedHeight(55)
       
         password_layout = QHBoxLayout()
         password_layout.setAlignment(Qt.AlignCenter) 
@@ -144,6 +140,8 @@ class Ui_MainWindow(object):
         self.loginButton.clicked.connect(self.loginfunction)
  
     def initialize_database(self):
+
+        
         
         conn = mysql.connector.connect(
             host="localhost",
@@ -225,7 +223,6 @@ class Ui_MainWindow(object):
         if email == "test@example.com" and password == "12345":
             self.messageLabel.setText("Login successful!")
             self.switch_to_main_page()
-            
 
        
         conn = mysql.connector.connect(
@@ -250,7 +247,8 @@ class Ui_MainWindow(object):
             
             if stored_password.startswith("$2b$"):
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-                    self.messageLabel.setText(" Login successful!")
+                   #9self.switch_to_main_page()
+                    self.messageLabel.setText("correct password!")
                     self.messageLabel.setStyleSheet("color: green;")
                 else:
                     self.messageLabel.setText(" Incorrect password!")
@@ -258,22 +256,14 @@ class Ui_MainWindow(object):
             else:
                 self.messageLabel.setText(" Invalid password format!")
                 self.messageLabel.setStyleSheet("color: red;")
-
         else:
             self.messageLabel.setText(" User not found!")
             self.messageLabel.setStyleSheet("color: red;")
-
-
+    
     def switch_to_main_page(self):
-        # UserWidget (ana sayfa) widget'ını oluştur
-        self.main_widget = UserWidget()
 
-        # Login widget'ını gizle
-        self.widget.hide()
-
-        # UserWidget (ana sayfa) widget'ını göster
-        self.centralwidget.layout().addWidget(self.main_widget)
-        self.main_widget.show()
-
-         
-
+        self.skinalyzer_window = SkinalyzerUI()
+        self.skinalyzer_window.show()
+        self.parent().close()
+        main_window = self.centralwidget.window()
+        main_window.close()

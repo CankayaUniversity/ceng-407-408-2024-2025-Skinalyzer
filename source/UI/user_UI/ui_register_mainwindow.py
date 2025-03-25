@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QApplication, QColumnView, QHBoxLayout, QLabel,
     QVBoxLayout, QWidget, QMessageBox, QSpacerItem)
 import mysql.connector
 import bcrypt
-import uuid
+
 
 class Ui_RegisterWindow(object):
     def on_register(self):

@@ -1,191 +1,522 @@
-from PySide6.QtCore import Qt, QRect
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QLabel, QPushButton,
-    QScrollArea, QSizePolicy, QTableView, QFrame, QTextBrowser,QHBoxLayout
-)
+import sys
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
+                              QHBoxLayout, QPushButton, QLabel, QFrame, QFileDialog,
+                              QScrollArea, QSizePolicy)
+from PySide6.QtGui import QPixmap, QFont, QIcon, QColor, QImage
+from PySide6.QtCore import Qt, QSize
 
-class Ui_Widget(object):
-    def setupUi(self, Widget):
-        Widget.setObjectName("Widget")
-        Widget.resize(832, 616)
-        Widget.setStyleSheet("QWidget#Widget { background-color: white; }")
-
-        # Scroll Area 
-        self.scrollArea = QScrollArea(Widget)
-        self.scrollArea.setObjectName("scrollArea")
-        self.scrollArea.setGeometry(QRect(0, 0, 832, 616))  # Sayfa boyutunu korur
-        self.scrollArea.setWidgetResizable(True)  # İçerik genişleyebilir
-        self.scrollArea.setStyleSheet("QScrollArea { background-color: white; }")
-
-        # All widget
-        self.scrollAreaWidgetContents = QWidget()
-        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setStyleSheet("QWidget#scrollAreaWidgetContents { background-color: white; }")
-
-        # Main Layout 
-        self.main_layout = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.main_layout.setContentsMargins(10, 0, 10, 10)
-        self.main_layout.setSpacing(10)
-
-        # Header frame
-        self.frame_3 = QFrame()
-        self.frame_3.setStyleSheet("""
-            QFrame {
-                
-                background-color: #9D5171;
-                
-                 }
-        """)
-        self.frame_3.setFixedHeight(100) 
-        self.main_layout.addWidget(self.frame_3)
-
-        #content of frame
-        self.inner_layout = QHBoxLayout(self.frame_3)
-        self.inner_layout.setContentsMargins(100, 0, 10, 10)
-        self.label_38 = QLabel("Skinanalyzer")
-        self.label_38.setStyleSheet("font: 600 12pt 'Segoe UI' background-color: #ffffff;")
-        self.inner_layout.addWidget(self.label_38)
-
+class SkinalyzerUI(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("SKINALYZER")
+        self.setMinimumSize(800, 600)
         
-        self.label_39 = QLabel("About us")
-        self.label_39.setStyleSheet("font: 600 12pt 'Segoe UI' background-color: #ffffff;")
-        self.inner_layout.addWidget(self.label_39)
-
-        self.label_40 = QLabel("Contact us")
-        self.label_40.setStyleSheet("font: 600 12pt 'Segoe UI' background-color: #ffffff;")
-        self.inner_layout.addWidget(self.label_40)
-        
-        self.label_42 = QLabel("Help")
-        self.label_42.setStyleSheet("font: 600 12pt 'Segoe UI' background-color: #ffffff;")
-        self.inner_layout.addWidget(self.label_42)
-
-        # Grey frame's layout
-        self.grey_frame_layout = QVBoxLayout()
-        self.grey_frame_layout.setContentsMargins(75, 0, 75, 10)
-
-        
-        # inner grey Frame'i
-        self.frame = QFrame()
-        self.frame.setStyleSheet("""
-            QFrame {
-                border-radius: 15px;
-                background-color: #dcdcdc;
-                border: 1px solid #b0b0b0;
-                padding: 10px;
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                                stop:0 #f5e1ea, stop:1 #e8c1d8);
             }
-        """)
-        self.frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.grey_frame_layout.addWidget(self.frame)
-       
-
-        self.inner_layout = QHBoxLayout(self.frame)  
-        self.inner_layout.setSpacing(10)
-
-        self.left_frame = QFrame(self.frame)
-        self.left_frame.setStyleSheet("background-color: transparent; border: none;")
-        self.left_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed) 
-        self.inner_layout.addWidget(self.left_frame)
-
-        left_layout = QVBoxLayout(self.left_frame)
-
-        # Grey frames header
-        self.label_37 = QLabel("Skinanalyzer")
-        self.label_37.setStyleSheet("font: 9pt 'Segoe UI'; color: black; border: none")
-        left_layout.addWidget(self.label_37)
-
-        # Açıklama metni
-        self.textBrowser_5 = QTextBrowser()
-        self.textBrowser_5.setStyleSheet("border: none; color: rgb(0, 0, 0);")
-        self.textBrowser_5.setText("Skinanalyzer evaluates symptoms on your skin and assists in early disease diagnosis through the power of innovative artificial intelligence (AI) skin technology.")
-        self.textBrowser_5.setFixedHeight(75) 
-
-        left_layout.addWidget(self.textBrowser_5)
-        
-
-        self.uploadLabel = QLabel("Upload foto")
-        self.uploadLabel.setStyleSheet("""
-        QLabel {
-                border-radius: 15px;
-                background-color: #ffffff;
-                color:#dcdcdc;                       
+            QWidget {
+                background-color: #F8EBF4;
+            }
+            QScrollArea {
+                background-color: transparent;
                 border: none;
-                padding: 10px;
-                font: 9pt 'Segoe UI';
-                
-        }
-        """)
-        self.uploadLabel.setFixedSize(200,100)
-        left_layout.addWidget(self.uploadLabel)
-
-        
-        self.uploadButton_5 = QPushButton("Upload")
-        self.uploadButton_5.setStyleSheet("""
-        QPushButton {
-                text-align: center;
-                background-color: rgb(157, 81, 113);
+            }
+            QScrollBar:vertical {
+                background: white;
+                width: 10px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background: #8a4a64;
+                min-height: 20px;
                 border-radius: 5px;
-        }
-        QPushButton:hover {
-                background-color: #E2E1E1  /* Hover rengini burada belirleyebilirsiniz */
-        }
-        """)
-        self.uploadButton_5.setFixedSize(100, 50) 
-        self.uploadButton_5.setEnabled(True)
-        left_layout.addWidget(self.uploadButton_5)
-
-        self.right_frame = QFrame(self.frame)
-        self.right_frame.setStyleSheet("background-color: transparent;")
-        self.right_frame.setFixedWidth(250)
-
-        right_layout = QVBoxLayout()  # Creating layout for right_frame
-        self.right_frame.setLayout(right_layout)  # Setting the layout to right_frame
-
-        # Right frame content
-        self.photo_label = QLabel("photo will be uploaded")
-        right_layout.addWidget(self.photo_label)  # Adding the widget to the right layout
-
-        # Add right_frame to the main layout
-        self.inner_layout.addWidget(self.right_frame)
-
-        # bottom grey frame 
-        self.frame_2 = QFrame()
-        self.frame_2.setStyleSheet("""
-            QFrame {
-                border-radius: 15px;
-                background-color: #dcdcdc;
-                border: 1px solid #b0b0b0;
-                padding: 10px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
             }
         """)
-        self.frame_2.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.grey_frame_layout.addWidget(self.frame_2)
         
-
-        # Frame 2 
-        self.inner_layout_2 = QVBoxLayout(self.frame_2)
-        self.label_41 = QLabel("You can access your saved analyse history by clicking the button below")
-        self.label_41.setStyleSheet("font: 9pt 'Segoe UI'; color: black; border: none;")
-        self.inner_layout_2.addWidget(self.label_41)
-
-        self.showButton = QPushButton("Show")
-        self.showButton.setStyleSheet("text-align: center; background-color: rgb(157, 81, 113);")
-        self.showButton.setFixedSize(100, 50) 
-        self.inner_layout_2.addWidget(self.showButton)
-
-        self.inner_layout_2.setAlignment(self.showButton, Qt.AlignmentFlag.AlignCenter)
-        self.inner_layout_2.setAlignment(self.label_41, Qt.AlignmentFlag.AlignCenter)
-
-        self.grey_frame_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.main_layout.addLayout(self.grey_frame_layout)
-
+        self.uploaded_image = None
+        
+        self.init_ui()
+        
+    def init_ui(self):
+        central_widget = QWidget()
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)  
+        
        
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        Widget.setLayout(QVBoxLayout())
-        Widget.layout().addWidget(self.scrollArea)
+        header = self.create_header()
+        main_layout.addWidget(header)
+        
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(50, 30, 50, 30)
+        content_layout.setSpacing(20)
+        
+        self.info_card = self.create_info_card()
+        
+        self.history_card = self.create_history_card()
+        
+        content_layout.addWidget(self.info_card)
+        content_layout.addWidget(self.history_card)
+        content_layout.addSpacing(20)
+        
+        scroll_area.setWidget(content_widget)
+        
+        main_layout.addWidget(scroll_area)
+        
+        self.setCentralWidget(central_widget)
+    
+    def create_header(self):
+        header = QWidget()
+        header.setFixedHeight(70)
+        header.setStyleSheet("background-color: #8a4a64;")
+        
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(20, 0, 20, 0)
+        
+      
+        logo_layout = QHBoxLayout()
+        logo = QLabel()
+        
+        logo.setFixedSize(40, 40)
+        logo.setStyleSheet("background-color: #ffffff; border-radius: 20px;")
+        logo_layout.addWidget(logo)
+        
+        title = QLabel("SKINALYZER")
+        title.setStyleSheet("color: white; font-size: 18px; font-weight: bold;")
+        logo_layout.addWidget(title)
+        
+        menu_layout = QHBoxLayout()
+        about_btn = QPushButton("about us")
+        contact_btn = QPushButton("contact")
+        profile_btn = QPushButton("profile")
+        
+        about_btn.clicked.connect(self.show_about)
+        contact_btn.clicked.connect(self.show_contact)
+        profile_btn.clicked.connect(self.show_profile)
+        
+        for btn in [about_btn, contact_btn, profile_btn]:
+            btn.setStyleSheet("""
+                QPushButton {
+                    color: white;
+                    background-color: transparent;
+                    border: none;
+                    font-size: 14px;
+                }
+                QPushButton:hover {
+                    text-decoration: underline;
+                }
+            """)
+        
+        profile_btn.setStyleSheet("""
+            QPushButton {
+                color: white;
+                background-color: transparent;
+                border: none;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                text-decoration: underline;
+            }
+        """)
+        
+        menu_layout.addWidget(about_btn)
+        menu_layout.addWidget(contact_btn)
+        menu_layout.addWidget(profile_btn)
+        menu_layout.setSpacing(20)
+        
+        header_layout.addLayout(logo_layout)
+        header_layout.addStretch()
+        header_layout.addLayout(menu_layout)
+        
+        return header
+    
+    def create_info_card(self):
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border-radius: 15px;
+            }
+        """)
+        
+        card_layout = QHBoxLayout(card)
+        card_layout.setContentsMargins(30, 30, 30, 30)
+        
+        left_content = QVBoxLayout()
+        
+        title_label = QLabel("SKINALYZER")
+        title_label.setStyleSheet("font-size: 18px; font-weight: bold; color: black;")
+        
+        subtitle_label = QLabel("Skinalyzer: AI-Based Skin Cancer Detection System")
+        subtitle_label.setStyleSheet("font-size: 16px; font-weight: bold; color: black;")
+        subtitle_label.setWordWrap(True)
+        
+        description_label = QLabel(
+            "'Skinalyzer' evaluates symptoms on your skin and assists "
+            "in early disease diagnosis through the power of "
+            "innovative artificial intelligence (AI) skin technology."
+        )
+        description_label.setWordWrap(True)
+        description_label.setStyleSheet("font-size: 14px; margin-top: 15px; color: black;")
+        
+        warning_label = QLabel("Make sure to consult your doctor without delay.")
+        warning_label.setStyleSheet("font-size: 14px; margin-top: 15px; color: black;")
+        
+        upload_button = QPushButton("UPLOAD PHOTO")
+        upload_button.setStyleSheet("""
+            QPushButton {
+                background-color: #e0e0e0;
+                border-radius: 10px;
+                padding: 15px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #d0d0d0;
+            }
+        """)
+        upload_button.clicked.connect(self.browse_image)
+        
+    
+       
+        self.image_label = QLabel()
+        self.image_label.setScaledContents(True)
+        left_content = QVBoxLayout()
+        
+        image_label = QLabel()
+        
+        image_label.setStyleSheet("background-color: #8a4a64; border-radius: 10px;")
+        image_label.setMinimumSize(300, 250)
+        self.image_label.setAlignment(Qt.AlignCenter)
 
-        self.uploadButton_5.clicked.connect(self.upload_button_clicked)
+        self.image_label.setMaximumSize(200, 200)
+        
+        
+        self.analyze_button = QPushButton("ANALYZE")
+        self.analyze_button.setStyleSheet("""
+            QPushButton {
+                background-color: #8a4a64;
+                color: white;
+                border-radius: 10px;
+                padding: 10px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #703a50;
+            }
+            QPushButton:disabled {
+                background-color: #cccccc;
+                color: #666666;
+            }
+        """)
+        self.analyze_button.setEnabled(False)
+        self.analyze_button.clicked.connect(self.analyze_image)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.image_label)
+        self.setLayout(layout)
+
+        left_content.addWidget(title_label)
+        left_content.addWidget(subtitle_label)
+        left_content.addWidget(description_label)
+        left_content.addWidget(warning_label)
+        left_content.addSpacing(20)
+        left_content.addWidget(upload_button)
+        left_content.addWidget(self.image_label)
+        left_content.addSpacing(10)
+        left_content.addWidget(self.analyze_button)
+        left_content.addStretch()
+
+        
+        right_content = QVBoxLayout()
+      
         
 
-    def upload_button_clicked(self):
-                print("Upload Button Clicked!")
+        self.image_label2 = QLabel()
+        pixmap = QPixmap("C:\\Users\\user\\OneDrive\\Masaüstü\\Ekran görüntüsü 2025-03-10 212056.png")  # Sabit resmin dosya yolu
+        self.image_label2.setPixmap(pixmap)
+        self.image_label2.setScaledContents(True)
+        
 
+        right_content.addWidget(self.image_label2)
+        right_content.addSpacing(10)
+        right_content.addStretch()
+
+        card_layout.addLayout(left_content, 1)
+        card_layout.addLayout(right_content, 1)
+
+        
+        return card
+    
+    def create_history_card(self):
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border-radius: 15px;
+            }
+        """)
+        
+        card_layout = QHBoxLayout(card)
+        card_layout.setContentsMargins(30, 30, 30, 30)
+        
+        
+        icon_label = QLabel()
+        
+        icon_label.setFixedSize(150, 150)
+        icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setStyleSheet("""
+            background-color: #8a4a64;
+            color: white;
+            font-size: 14px;
+            border-radius: 10px;
+        """)
+        icon_label.setText("History\nIcon")
+        
+       
+        right_content = QVBoxLayout()
+        
+        text_label = QLabel("You can access your saved analyse history by clicking the button below.")
+        text_label.setStyleSheet("font-size: 14px; color: black;")
+        
+        show_button = QPushButton("SHOW")
+        show_button.setStyleSheet("""
+            QPushButton {
+                background-color: #8a4a64;
+                color: white;
+                border-radius: 15px;
+                padding: 10px;
+                min-width: 150px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #703a50;
+            }
+        """)
+        show_button.clicked.connect(self.show_history)
+        
+        self.history_items_container = QFrame()
+        self.history_items_container.setStyleSheet("background-color: transparent;")
+        self.history_items_layout = QVBoxLayout(self.history_items_container)
+        self.history_items_layout.setContentsMargins(0, 10, 0, 0)
+        self.history_items_container.hide() 
+        
+        right_content.addWidget(text_label)
+        right_content.addSpacing(20)
+        right_content.addWidget(show_button, 0, Qt.AlignCenter)
+        right_content.addWidget(self.history_items_container)
+        
+        card_layout.addWidget(icon_label)
+        card_layout.addSpacing(20)
+        card_layout.addLayout(right_content, 1)
+        
+        return card
+    
+    def browse_image(self):
+        file_dialog = QFileDialog()
+        file_path, _ = file_dialog.getOpenFileName(
+            self, "Select Skin Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)"
+        )
+        
+        if file_path:
+            self.uploaded_image = file_path
+            pixmap = QPixmap(file_path)
+            if not pixmap.isNull():
+                
+                pixmap = pixmap.scaled(300, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.image_label.setPixmap(pixmap)
+                self.image_label.setStyleSheet("background-color: transparent; border-radius: 10px;")
+                
+                self.analyze_button.setEnabled(True)
+    
+    def analyze_image(self):
+        
+        if self.uploaded_image:
+            self.image_label.setPixmap(QPixmap(self.uploaded_image).scaled(
+                300, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            ))
+            self.image_label.setStyleSheet("""
+                background-color: transparent; 
+                border: 2px solid #4CAF50;
+                border-radius: 10px;
+            """)
+            
+            
+            while self.results_layout.count() > 1:
+                item = self.results_layout.takeAt(1)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+            
+            results_header = QLabel("Analysis Results (Sample)")
+            results_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
+            
+            risk_label = QLabel("Risk Assessment: Low")
+            risk_label.setStyleSheet("""
+                background-color: #e8f5e9;
+                color: #2e7d32;
+                padding: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                margin-top: 5px;
+            """)
+            
+            details_label = QLabel("Detailed Analysis:")
+            details_label.setStyleSheet("font-weight: bold; margin-top: 10px;")
+            
+            findings = QLabel(
+                "• No suspicious patterns detected\n"
+                "• Regular border pattern\n"
+                "• Even coloration\n"
+                "• Size within normal parameters\n"
+                "• No asymmetry detected"
+            )
+            findings.setStyleSheet("margin-left: 20px;")
+            
+            recommendation = QLabel("Recommendation: Regular follow-up in 6 months")
+            recommendation.setStyleSheet("margin-top: 10px; font-weight: bold;")
+            
+            disclaimer = QLabel(
+                "Disclaimer: This is an AI-assisted analysis and should not replace "
+                "professional medical advice. Please consult with a dermatologist."
+            )
+            disclaimer.setStyleSheet("color: #757575; font-style: italic; margin-top: 15px;")
+            disclaimer.setWordWrap(True)
+            
+            self.results_layout.addWidget(results_header)
+            self.results_layout.addWidget(risk_label)
+            self.results_layout.addWidget(details_label)
+            self.results_layout.addWidget(findings)
+            self.results_layout.addWidget(recommendation)
+            self.results_layout.addWidget(disclaimer)
+            
+            self.analyze_button.setText("ANALYZED")
+            self.analyze_button.setEnabled(False)
+            
+            self.add_to_history()
+    
+    def add_to_history(self):
+        from datetime import datetime
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+        history_item = QFrame()
+        history_item.setStyleSheet("""
+            QFrame {
+                background-color: #f0f0f0;
+                border-radius: 8px;
+                margin-top: 5px;
+            }
+        """)
+        
+        item_layout = QHBoxLayout(history_item)
+        
+        thumbnail = QLabel()
+        if self.uploaded_image:
+            pixmap = QPixmap(self.uploaded_image).scaled(
+                50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+            thumbnail.setPixmap(pixmap)
+        thumbnail.setFixedSize(50, 50)
+        thumbnail.setStyleSheet("background-color: #8a4a64; border-radius: 5px;")
+        
+        details = QLabel(f"Analysis - {current_time}\nRisk Level: Low")
+        details.setStyleSheet("font-size: 12px;")
+        
+        item_layout.addWidget(thumbnail)
+        item_layout.addWidget(details)
+        item_layout.addStretch()
+        
+        self.history_items_layout.addWidget(history_item)
+    
+    def show_history(self):
+        
+        if self.history_items_container.isHidden():
+            if self.history_items_layout.count() == 0:
+               
+                no_history = QLabel("No previous analyses found.")
+                no_history.setStyleSheet("""
+                    background-color: #e0e0e0;
+                    padding: 10px;
+                    border-radius: 5px;
+                """)
+                self.history_items_layout.addWidget(no_history)
+            
+            self.history_items_container.show()
+        else:
+            self.history_items_container.hide()
+    
+    def show_about(self):
+       
+        about_frame = QFrame(self)
+        about_frame.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border-radius: 15px;
+                border: 1px solid #8a4a64;
+            }
+        """)
+        about_frame.setGeometry(100, 100, 600, 400)
+        
+        about_layout = QVBoxLayout(about_frame)
+        
+        title = QLabel("About Skinalyzer")
+        title.setStyleSheet("font-size: 18px; font-weight: bold;")
+        
+        content = QLabel(
+            "Skinalyzer is an AI-powered tool designed to help with the early detection "
+            "of skin conditions and potential cancer indicators.\n\n"
+            "Our mission is to make skin health accessible to everyone through innovative "
+            "technology and artificial intelligence.\n\n"
+            "Note: This is a demonstration application and not intended for medical use."
+        )
+        content.setWordWrap(True)
+        
+        close_btn = QPushButton("Close")
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #8a4a64;
+                color: white;
+                border-radius: 10px;
+                padding: 10px;
+                min-width: 100px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #703a50;
+            }
+        """)
+        close_btn.clicked.connect(about_frame.close)
+        
+        about_layout.addWidget(title)
+        about_layout.addWidget(content)
+        about_layout.addStretch()
+        about_layout.addWidget(close_btn, 0, Qt.AlignCenter)
+        
+        about_frame.show()
+
+    
+    def show_contact(self):
+        
+        print("Contact clicked")
+    
+    def show_profile(self):
+       
+        print("Profile clicked")
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = SkinalyzerUI()
+    window.show()
+    sys.exit(app.exec())
