@@ -247,9 +247,7 @@ class Ui_MainWindow(object):
             
             if stored_password.startswith("$2b$"):
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-                   #9self.switch_to_main_page()
-                    self.messageLabel.setText("correct password!")
-                    self.messageLabel.setStyleSheet("color: green;")
+                    self.switch_to_main_page()
                 else:
                     self.messageLabel.setText(" Incorrect password!")
                     self.messageLabel.setStyleSheet("color: red;")

@@ -4,7 +4,8 @@ from PySide6.QtWidgets import (QApplication, QColumnView, QHBoxLayout, QLabel,
     QVBoxLayout, QWidget, QMessageBox, QSpacerItem)
 import mysql.connector
 import bcrypt
-
+import uuid
+import re
 
 class Ui_RegisterWindow(object):
     def on_register(self):
@@ -18,16 +19,23 @@ class Ui_RegisterWindow(object):
         if not full_name or not user_name or not email or not password or not confirm_password:
             self.show_error("Please fill in all fields!")
             return
+        if len(full_name) < 3:
+            self.show_error("Full name must be at least 3 characters long!")
+            return
+
+        if len(password) < 4:
+            self.show_error("Password must be at least 4 characters long!")
+            return
+
 
         if password != confirm_password:
             self.show_error("Passwords do not match!")
             return
-
+        
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            self.show_error("Please enter a valid email address!")
+            return     
        
-        if "@" not in email:
-            if not email.isdigit():
-                self.show_error("The phone number must consist of numbers only!")
-                return
 
         try:
             conn = mysql.connector.connect(
@@ -41,7 +49,7 @@ class Ui_RegisterWindow(object):
             cursor.execute("SELECT Email FROM user WHERE Email = %s", (email,))
             existing_user = cursor.fetchone()
             if existing_user:
-                self.show_error("This email or phone number is already registered!")
+                self.show_error("This email is already registered!")
                 cursor.close()
                 conn.close()
                 return
@@ -223,9 +231,9 @@ class Ui_RegisterWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle("Register")
         self.label.setText("Please Fill out form to Register!")
-        self.label_2.setText("Full name:")
-        self.label_3.setText("Username:")
-        self.label_4.setText("Email/Phone number:")
+        self.label_2.setText("Name:")
+        self.label_3.setText("Surname:")
+        self.label_4.setText("Email :")
         self.label_5.setText("Password:")
         self.label_6.setText("Confirm Password:")
         self.label_7.setText("Select Your skin color:")
