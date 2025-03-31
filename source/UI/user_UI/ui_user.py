@@ -5,6 +5,9 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PySide6.QtGui import QPixmap, QFont, QIcon, QColor, QImage
 from PySide6.QtCore import Qt, QSize
 
+# Validator modülünü içe aktarın
+from skin_lesion_validator import SkinLesionValidator
+
 class SkinalyzerUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -40,6 +43,12 @@ class SkinalyzerUI(QMainWindow):
         
         self.uploaded_image = None
         
+        # Validator'ü başlat ve referans veri setini yükle
+        self.validator = SkinLesionValidator()
+        folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
+        folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+        self.validator.load_reference_dataset([folder1, folder2])
+        
         self.init_ui()
         
     def init_ui(self):
@@ -48,7 +57,6 @@ class SkinalyzerUI(QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)  
         
-       
         header = self.create_header()
         main_layout.addWidget(header)
         
@@ -63,7 +71,6 @@ class SkinalyzerUI(QMainWindow):
         content_layout.setSpacing(20)
         
         self.info_card = self.create_info_card()
-        
         self.history_card = self.create_history_card()
         
         content_layout.addWidget(self.info_card)
@@ -71,23 +78,18 @@ class SkinalyzerUI(QMainWindow):
         content_layout.addSpacing(20)
         
         scroll_area.setWidget(content_widget)
-        
         main_layout.addWidget(scroll_area)
-        
         self.setCentralWidget(central_widget)
     
     def create_header(self):
         header = QWidget()
         header.setFixedHeight(70)
         header.setStyleSheet("background-color: #8a4a64;")
-        
         header_layout = QHBoxLayout(header)
         header_layout.setContentsMargins(20, 0, 20, 0)
-        
       
         logo_layout = QHBoxLayout()
         logo = QLabel()
-        
         logo.setFixedSize(40, 40)
         logo.setStyleSheet("background-color: #ffffff; border-radius: 20px;")
         logo_layout.addWidget(logo)
@@ -139,7 +141,6 @@ class SkinalyzerUI(QMainWindow):
         header_layout.addLayout(logo_layout)
         header_layout.addStretch()
         header_layout.addLayout(menu_layout)
-        
         return header
     
     def create_info_card(self):
@@ -153,14 +154,14 @@ class SkinalyzerUI(QMainWindow):
         
         card_layout = QHBoxLayout(card)
         card_layout.setContentsMargins(30, 30, 30, 30)
-        
         left_content = QVBoxLayout()
         
         title_label = QLabel("SKINALYZER")
+        title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("font-size: 18px; font-weight: bold; color: black;")
         
         subtitle_label = QLabel("Skinalyzer: AI-Based Skin Cancer Detection System")
-        subtitle_label.setStyleSheet("font-size: 16px; font-weight: bold; color: black;")
+        subtitle_label.setStyleSheet("font-size: 17px; font-weight: bold; color: black;")
         subtitle_label.setWordWrap(True)
         
         description_label = QLabel(
@@ -179,8 +180,9 @@ class SkinalyzerUI(QMainWindow):
             QPushButton {
                 background-color: #e0e0e0;
                 border-radius: 10px;
-                padding: 15px;
+                padding: 10px;
                 font-weight: bold;
+                width: 150px;
             }
             QPushButton:hover {
                 background-color: #d0d0d0;
@@ -188,20 +190,11 @@ class SkinalyzerUI(QMainWindow):
         """)
         upload_button.clicked.connect(self.browse_image)
         
-    
-       
         self.image_label = QLabel()
         self.image_label.setScaledContents(True)
-        left_content = QVBoxLayout()
-        
-        image_label = QLabel()
-        
-        image_label.setStyleSheet("background-color: #8a4a64; border-radius: 10px;")
-        image_label.setMinimumSize(300, 250)
         self.image_label.setAlignment(Qt.AlignCenter)
-
+        self.image_label.setMinimumSize(300, 250)
         self.image_label.setMaximumSize(200, 200)
-        
         
         self.analyze_button = QPushButton("ANALYZE")
         self.analyze_button.setStyleSheet("""
@@ -222,11 +215,7 @@ class SkinalyzerUI(QMainWindow):
         """)
         self.analyze_button.setEnabled(False)
         self.analyze_button.clicked.connect(self.analyze_image)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.image_label)
-        self.setLayout(layout)
-
+        
         left_content.addWidget(title_label)
         left_content.addWidget(subtitle_label)
         left_content.addWidget(description_label)
@@ -236,29 +225,26 @@ class SkinalyzerUI(QMainWindow):
         left_content.addWidget(self.image_label)
         left_content.addSpacing(10)
         left_content.addWidget(self.analyze_button)
+        
+        # Layout for displaying analysis results
+        self.results_layout = QVBoxLayout()
+        left_content.addLayout(self.results_layout)
         left_content.addStretch()
-
         
+        # Right side content (e.g. a static image)
         right_content = QVBoxLayout()
-      
-        
-
         self.image_label2 = QLabel()
-        pixmap = QPixmap("C:\\Users\\user\\OneDrive\\Masaüstü\\Ekran görüntüsü 2025-03-10 212056.png")  # Sabit resmin dosya yolu
+        pixmap = QPixmap("C:\\Users\\user\\OneDrive\\Masaüstü\\Ekran görüntüsü 2025-03-10 212056.png")
         self.image_label2.setPixmap(pixmap)
         self.image_label2.setScaledContents(True)
-        
-
         right_content.addWidget(self.image_label2)
         right_content.addSpacing(10)
         right_content.addStretch()
-
+        
         card_layout.addLayout(left_content, 1)
         card_layout.addLayout(right_content, 1)
-
-        
         return card
-    
+
     def create_history_card(self):
         card = QFrame()
         card.setStyleSheet("""
@@ -271,9 +257,7 @@ class SkinalyzerUI(QMainWindow):
         card_layout = QHBoxLayout(card)
         card_layout.setContentsMargins(30, 30, 30, 30)
         
-        
         icon_label = QLabel()
-        
         icon_label.setFixedSize(150, 150)
         icon_label.setAlignment(Qt.AlignCenter)
         icon_label.setStyleSheet("""
@@ -284,13 +268,14 @@ class SkinalyzerUI(QMainWindow):
         """)
         icon_label.setText("History\nIcon")
         
-       
         right_content = QVBoxLayout()
+        right_content.setSpacing(0)
         
         text_label = QLabel("You can access your saved analyse history by clicking the button below.")
-        text_label.setStyleSheet("font-size: 14px; color: black;")
+        text_label.setStyleSheet("font-size: 17px; color: black;")
+        text_label.setAlignment(Qt.AlignCenter)
         
-        show_button = QPushButton("SHOW")
+        show_button = QPushButton("SHOW PAST RESULTS")
         show_button.setStyleSheet("""
             QPushButton {
                 background-color: #8a4a64;
@@ -299,6 +284,7 @@ class SkinalyzerUI(QMainWindow):
                 padding: 10px;
                 min-width: 150px;
                 font-weight: bold;
+                text-align: center;
             }
             QPushButton:hover {
                 background-color: #703a50;
@@ -320,7 +306,6 @@ class SkinalyzerUI(QMainWindow):
         card_layout.addWidget(icon_label)
         card_layout.addSpacing(20)
         card_layout.addLayout(right_content, 1)
-        
         return card
     
     def browse_image(self):
@@ -333,16 +318,14 @@ class SkinalyzerUI(QMainWindow):
             self.uploaded_image = file_path
             pixmap = QPixmap(file_path)
             if not pixmap.isNull():
-                
                 pixmap = pixmap.scaled(300, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 self.image_label.setPixmap(pixmap)
                 self.image_label.setStyleSheet("background-color: transparent; border-radius: 10px;")
-                
                 self.analyze_button.setEnabled(True)
     
     def analyze_image(self):
-        
         if self.uploaded_image:
+            # Show the uploaded image
             self.image_label.setPixmap(QPixmap(self.uploaded_image).scaled(
                 300, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation
             ))
@@ -351,19 +334,58 @@ class SkinalyzerUI(QMainWindow):
                 border: 2px solid #4CAF50;
                 border-radius: 10px;
             """)
+            # Display "Analyzing..." message
+            self.analyzing_label = QLabel("Analyzing...")
+            self.analyzing_label.setStyleSheet("font-size: 16px; font-weight: bold; color: red;")
+            self.results_layout.addWidget(self.analyzing_label)
+            QApplication.processEvents()
             
+            # İlk olarak validator ile cilt lezyonu olup olmadığını kontrol et
+            is_valid, similarity, validation_message = self.validator.is_skin_lesion(self.uploaded_image)
+            if not is_valid:
+                self.results_layout.removeWidget(self.analyzing_label)
+                self.analyzing_label.deleteLater()
+                self.analyzing_label = None
+                error_label = QLabel(validation_message)
+                error_label.setStyleSheet("color: red; font-weight: bold;")
+                self.results_layout.addWidget(error_label)
+                return
             
-            while self.results_layout.count() > 1:
-                item = self.results_layout.takeAt(1)
+            # Eğer validator uygunluk onayı verdiyse, predict_model çalıştır
+            from predict_model import predict_model as run_prediction
+            try:
+                result = run_prediction(self.uploaded_image)
+            except Exception as e:
+                error_label = QLabel("Model error: " + str(e))
+                self.results_layout.addWidget(error_label)
+                self.results_layout.removeWidget(self.analyzing_label)
+                self.analyzing_label.deleteLater()
+                self.analyzing_label = None
+                return
+
+            # Extract prediction results
+            predicted_class = result["predicted_class"]
+            confidence = result["confidence"]
+            risk_level = result["risk_level"]
+            lesion_description = result["lesion_description"]
+
+            # Remove "Analyzing..." message and clear previous results
+            self.results_layout.removeWidget(self.analyzing_label)
+            self.analyzing_label.deleteLater()
+            self.analyzing_label = None
+
+            while self.results_layout.count() > 0:
+                item = self.results_layout.takeAt(0)
                 widget = item.widget()
                 if widget is not None:
                     widget.deleteLater()
-            
-            results_header = QLabel("Analysis Results (Sample)")
+
+            # Display the results
+            results_header = QLabel("Analysis Results")
             results_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
-            
-            risk_label = QLabel("Risk Assessment: Low")
-            risk_label.setStyleSheet("""
+
+            class_label = QLabel("Predicted Class: " + predicted_class)
+            class_label.setStyleSheet("""
                 background-color: #e8f5e9;
                 color: #2e7d32;
                 padding: 10px;
@@ -371,39 +393,25 @@ class SkinalyzerUI(QMainWindow):
                 font-weight: bold;
                 margin-top: 5px;
             """)
-            
-            details_label = QLabel("Detailed Analysis:")
-            details_label.setStyleSheet("font-weight: bold; margin-top: 10px;")
-            
-            findings = QLabel(
-                "• No suspicious patterns detected\n"
-                "• Regular border pattern\n"
-                "• Even coloration\n"
-                "• Size within normal parameters\n"
-                "• No asymmetry detected"
-            )
-            findings.setStyleSheet("margin-left: 20px;")
-            
-            recommendation = QLabel("Recommendation: Regular follow-up in 6 months")
-            recommendation.setStyleSheet("margin-top: 10px; font-weight: bold;")
-            
-            disclaimer = QLabel(
-                "Disclaimer: This is an AI-assisted analysis and should not replace "
-                "professional medical advice. Please consult with a dermatologist."
-            )
-            disclaimer.setStyleSheet("color: #757575; font-style: italic; margin-top: 15px;")
-            disclaimer.setWordWrap(True)
-            
+
+            confidence_label = QLabel("Confidence Score: {:.2f}%".format(confidence))
+            confidence_label.setStyleSheet("margin-top: 5px;")
+
+            risk_label = QLabel("Risk Level: " + risk_level)
+            risk_label.setStyleSheet("margin-top: 5px; font-weight: bold;")
+
+            description_label = QLabel("Lesion Description: " + lesion_description)
+            description_label.setWordWrap(True)
+            description_label.setStyleSheet("margin-top: 5px;")
+
             self.results_layout.addWidget(results_header)
+            self.results_layout.addWidget(class_label)
+            self.results_layout.addWidget(confidence_label)
             self.results_layout.addWidget(risk_label)
-            self.results_layout.addWidget(details_label)
-            self.results_layout.addWidget(findings)
-            self.results_layout.addWidget(recommendation)
-            self.results_layout.addWidget(disclaimer)
-            
+            self.results_layout.addWidget(description_label)
+
             self.analyze_button.setText("ANALYZED")
             self.analyze_button.setEnabled(False)
-            
             self.add_to_history()
     
     def add_to_history(self):
@@ -440,10 +448,8 @@ class SkinalyzerUI(QMainWindow):
         self.history_items_layout.addWidget(history_item)
     
     def show_history(self):
-        
         if self.history_items_container.isHidden():
             if self.history_items_layout.count() == 0:
-               
                 no_history = QLabel("No previous analyses found.")
                 no_history.setStyleSheet("""
                     background-color: #e0e0e0;
@@ -451,13 +457,11 @@ class SkinalyzerUI(QMainWindow):
                     border-radius: 5px;
                 """)
                 self.history_items_layout.addWidget(no_history)
-            
             self.history_items_container.show()
         else:
             self.history_items_container.hide()
     
     def show_about(self):
-       
         about_frame = QFrame(self)
         about_frame.setStyleSheet("""
             QFrame {
@@ -467,12 +471,9 @@ class SkinalyzerUI(QMainWindow):
             }
         """)
         about_frame.setGeometry(100, 100, 600, 400)
-        
         about_layout = QVBoxLayout(about_frame)
-        
         title = QLabel("About Skinalyzer")
         title.setStyleSheet("font-size: 18px; font-weight: bold;")
-        
         content = QLabel(
             "Skinalyzer is an AI-powered tool designed to help with the early detection "
             "of skin conditions and potential cancer indicators.\n\n"
@@ -481,7 +482,6 @@ class SkinalyzerUI(QMainWindow):
             "Note: This is a demonstration application and not intended for medical use."
         )
         content.setWordWrap(True)
-        
         close_btn = QPushButton("Close")
         close_btn.setStyleSheet("""
             QPushButton {
@@ -497,23 +497,17 @@ class SkinalyzerUI(QMainWindow):
             }
         """)
         close_btn.clicked.connect(about_frame.close)
-        
         about_layout.addWidget(title)
         about_layout.addWidget(content)
         about_layout.addStretch()
         about_layout.addWidget(close_btn, 0, Qt.AlignCenter)
-        
         about_frame.show()
-
     
     def show_contact(self):
-        
         print("Contact clicked")
     
     def show_profile(self):
-       
         print("Profile clicked")
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
