@@ -4,13 +4,16 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                               QScrollArea, QSizePolicy)
 from PySide6.QtGui import QPixmap, QFont, QIcon, QColor, QImage
 from PySide6.QtCore import Qt, QSize
+import mysql.connector
+from result import AnalysisResultsWindow
 
 # Validator modülünü içe aktarın
 from skin_lesion_validator import SkinLesionValidator
 
 class SkinalyzerUI(QMainWindow):
-    def __init__(self):
+    def __init__(self,user_id):
         super().__init__()
+        self.user_id = user_id
         self.setWindowTitle("SKINALYZER")
         self.setMinimumSize(800, 600)
         
@@ -45,8 +48,8 @@ class SkinalyzerUI(QMainWindow):
         
         # Validator'ü başlat ve referans veri setini yükle
         self.validator = SkinLesionValidator()
-        folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
-        folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+        folder1 = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_1"
+        folder2 = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_2"
         self.validator.load_reference_dataset([folder1, folder2])
         
         self.init_ui()
@@ -355,6 +358,9 @@ class SkinalyzerUI(QMainWindow):
             from predict_model import predict_model as run_prediction
             try:
                 result = run_prediction(self.uploaded_image)
+                save_result_to_db(self.user_id, self.uploaded_image, result["predicted_class"],
+                  result["confidence"], result["risk_level"], result["lesion_description"])
+
             except Exception as e:
                 error_label = QLabel("Model error: " + str(e))
                 self.results_layout.addWidget(error_label)
@@ -448,18 +454,8 @@ class SkinalyzerUI(QMainWindow):
         self.history_items_layout.addWidget(history_item)
     
     def show_history(self):
-        if self.history_items_container.isHidden():
-            if self.history_items_layout.count() == 0:
-                no_history = QLabel("No previous analyses found.")
-                no_history.setStyleSheet("""
-                    background-color: #e0e0e0;
-                    padding: 10px;
-                    border-radius: 5px;
-                """)
-                self.history_items_layout.addWidget(no_history)
-            self.history_items_container.show()
-        else:
-            self.history_items_container.hide()
+         self.results_window = AnalysisResultsWindow(self.user_id)
+         self.results_window.show()
     
     def show_about(self):
         about_frame = QFrame(self)
@@ -508,6 +504,25 @@ class SkinalyzerUI(QMainWindow):
     
     def show_profile(self):
         print("Profile clicked")
+    
+def save_result_to_db(user_id, image_path, predicted_class, confidence, risk_level, lesion_description):
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="Tprksu.001",
+        database="user_database"
+    )
+    cursor = conn.cursor()
+
+    query = """
+    INSERT INTO result (UserID, ImagePath, PredictedClass, Confidence, RiskLevel, LesionDescription)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    values = (user_id, image_path, predicted_class, confidence, risk_level, lesion_description)
+    cursor.execute(query, values)
+    conn.commit()
+    cursor.close()
+    conn.close()   
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

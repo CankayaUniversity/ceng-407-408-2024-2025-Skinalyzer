@@ -138,6 +138,8 @@ class Ui_MainWindow(object):
 
        
         self.loginButton.clicked.connect(self.loginfunction)
+        self.initialize_database()
+
  
     def initialize_database(self):
 
@@ -185,7 +187,21 @@ class Ui_MainWindow(object):
         cursor.execute(create_table_query)
         conn.commit()
         print("User tablosu başarıyla oluşturuldu.")
-
+        create_result_table_query = """
+        CREATE TABLE IF NOT EXISTS result (
+            ResultID INT AUTO_INCREMENT PRIMARY KEY,
+            UserID VARCHAR(50),
+            ImagePath TEXT,
+            PredictedClass VARCHAR(50),
+            Confidence FLOAT,
+            RiskLevel VARCHAR(50),
+            LesionDescription TEXT,
+            DateAnalyzed DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (UserID) REFERENCES user(UserID) ON DELETE CASCADE
+        );
+        """
+        cursor.execute(create_result_table_query)
+        print("Result tablosu başarıyla oluşturuldu.")
         
         self.insert_users(cursor, conn)
 
@@ -234,7 +250,8 @@ class Ui_MainWindow(object):
         cursor = conn.cursor()
 
         
-        query = "SELECT Password FROM user WHERE Email = %s"
+        query = "SELECT UserID, Password FROM user WHERE Email = %s"
+
         cursor.execute(query, (email,))
         user = cursor.fetchone()
 
@@ -242,8 +259,8 @@ class Ui_MainWindow(object):
         conn.close()
 
         if user:
-            stored_password = user[0]
-
+            self.current_user_id = user[0]
+            stored_password = user[1]
             
             if stored_password.startswith("$2b$"):
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
@@ -260,7 +277,7 @@ class Ui_MainWindow(object):
     
     def switch_to_main_page(self):
 
-        self.skinalyzer_window = SkinalyzerUI()
+        self.skinalyzer_window = SkinalyzerUI(self.current_user_id)
         self.skinalyzer_window.show()
         self.parent().close()
         main_window = self.centralwidget.window()

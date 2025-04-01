@@ -174,12 +174,12 @@ class SkinLesionValidator:
 
 # Example usage (for testing purposes)
 if __name__ == "__main__":
-    folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
-    folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+    folder1 = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_1"
+    folder2 = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_2"
     
     validator = SkinLesionValidator()
     validator.load_reference_dataset([folder1, folder2])
     
-    test_image_path = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1\ISIC_0024306.jpg"  # Update with an actual image path
+    test_image_path = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_1\ISIC_0024306.jpg"  # Update with an actual image path
     is_relevant, similarity, message = validator.is_skin_lesion(test_image_path)
     print(message)

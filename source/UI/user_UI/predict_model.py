@@ -4,7 +4,7 @@ from tensorflow.keras.models import load_model
 import tensorflow_addons as tfa
 
 # Load the model (loaded only once)
-model = load_model("saved_models/final_global_model", custom_objects={
+model = load_model(r"C:\Program Files\saved_models\final_global_model", custom_objects={
     "F1Score": tfa.metrics.F1Score
 })
 
