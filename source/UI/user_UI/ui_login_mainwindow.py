@@ -146,10 +146,11 @@ class Ui_MainWindow(object):
         
         
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="Tprksu.001",
-            database="user_database"
+            host="mydatabase.c9y4kwss4q2e.eu-north-1.rds.amazonaws.com",
+            user="bilgesufindik",
+            password="Topraksu.01",
+            database="mydatabase",
+            port=3306
         )
         cursor = conn.cursor()
 
