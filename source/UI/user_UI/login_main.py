@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
         self.register_window = RegisterWindow()  
         self.register_window.show()  
         self.close()   
+        
 
 if __name__ == "__main__":
     app = QApplication([])

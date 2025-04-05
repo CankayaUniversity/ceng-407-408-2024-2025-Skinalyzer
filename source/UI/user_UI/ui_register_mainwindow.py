@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QColumnView, QHBoxLayout, QLabel,
     QLineEdit, QMainWindow, QPushButton, QSizePolicy, QStatusBar,
-    QVBoxLayout, QWidget, QMessageBox, QSpacerItem)
+    QVBoxLayout, QWidget, QMessageBox, QSpacerItem,QComboBox)
 import mysql.connector
 import bcrypt
 import uuid
@@ -97,7 +97,7 @@ class Ui_RegisterWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1019, 679)
         MainWindow.setStyleSheet(u"background-color: rgb(248, 235, 244);")
-        
+        self.window = MainWindow 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         
@@ -196,20 +196,52 @@ class Ui_RegisterWindow(object):
         self.label_7.setStyleSheet(u"color: rgb(0, 0, 0);")
         self.verticalLayout.addWidget(self.label_7)
 
-        self.skinColor = QLineEdit(self.widget)
-        self.skinColor.setObjectName(u"skinColor")
-        self.skinColor.setStyleSheet(u"QLineEdit {\n    color: rgb(0, 0, 0); \n    background-color: rgb(255, 255, 255);\n    font: 9pt \"Segoe UI\";\n    border: 1px solid #9D5171;\n    border-radius: 5px;\n}")
+        self.skinColor = QComboBox(self.widget)
+        self.skinColor.setObjectName("skinColor")
+        self.skinColor.setStyleSheet("""
+            QComboBox {
+                color: black;  /* Seçilen öğenin rengi */
+                background-color: white;
+                font: 9pt "Segoe UI";
+                border: 1px solid #9D5171;
+                border-radius: 5px;
+            }
+
+            QComboBox QAbstractItemView {
+                color: black; 
+                background-color: white;
+                selection-background-color: #9D5171;  
+                selection-color: white;  
+            }
+        """)
+
+        self.skinColor.addItems(["Select","Light", "Medium", "Dark"])
+
         self.verticalLayout.addWidget(self.skinColor)
 
-        self.label_8 = QLabel(self.widget)
-        self.label_8.setObjectName(u"label_8")
-        self.label_8.setStyleSheet(u"color: rgb(34, 34, 34);")
-        self.verticalLayout.addWidget(self.label_8)
+        self.back_login = QPushButton(self.widget)
+        self.back_login .setObjectName(u"back_login")
+        self.back_login .setStyleSheet("""
+                QPushButton {
+                    color: #222222;
+                    background-color: transparent;
+                    border: none;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    text-decoration: underline;
+                }
+            """)
+        self.verticalLayout.addWidget(self.back_login)
+        self.back_login.clicked.connect(self.back_to_login)
 
         self.registerButton = QPushButton(self.widget)
         self.registerButton.setObjectName(u"registerButton")
         self.registerButton.setStyleSheet(u"background-color: rgb(157, 81, 113);")
-        self.verticalLayout.addWidget(self.registerButton)
+        self.registerButton.setFixedWidth(350)
+        self.verticalLayout.addWidget(self.registerButton, alignment=Qt.AlignCenter)
+        
+        
        
         self.registerButton.clicked.connect(self.on_register)
 
@@ -237,5 +269,12 @@ class Ui_RegisterWindow(object):
         self.label_5.setText("Password:")
         self.label_6.setText("Confirm Password:")
         self.label_7.setText("Select Your skin color:")
-        self.label_8.setText("Yes I have an account? Login")
+        self.back_login.setText("Yes I have an account? Login")
         self.registerButton.setText("Register")
+
+
+    def back_to_login(self):
+        from login_main import MainWindow
+        self.back_window = MainWindow()
+        self.back_window.show()
+        self.window.close()  

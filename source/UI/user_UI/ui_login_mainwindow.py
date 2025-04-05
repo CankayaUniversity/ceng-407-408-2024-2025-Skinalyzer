@@ -57,7 +57,7 @@ class Ui_MainWindow(object):
                                  "}")
        
         self.email.setFixedWidth(350)
-        self.email.setFixedHeight(55)
+        self.email.setFixedHeight(60)
         email_layout = QHBoxLayout()
         email_layout.setAlignment(Qt.AlignCenter)  
         email_layout.addWidget(self.email)
@@ -83,7 +83,7 @@ class Ui_MainWindow(object):
                                     "}")
         
         self.password.setFixedWidth(350)
-        self.password.setFixedHeight(55)
+        self.password.setFixedHeight(60)
       
         password_layout = QHBoxLayout()
         password_layout.setAlignment(Qt.AlignCenter) 
@@ -232,22 +232,21 @@ class Ui_MainWindow(object):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
 
     def loginfunction(self):
-        
+        self.messageLabel.setText("Loading...")
+        self.messageLabel.setStyleSheet("color: black;")
+
+        QApplication.processEvents() 
         email = self.email.text()
         password = self.password.text()
 
-
-        if email == "test@example.com" and password == "12345":
-            self.messageLabel.setText("Login successful!")
-            self.switch_to_main_page()
-
        
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="Tprksu.001",
-            database="user_database"
-        )
+            host="mydatabase.c9y4kwss4q2e.eu-north-1.rds.amazonaws.com",
+            user="bilgesufindik",
+            password="Topraksu.01",
+            database="mydatabase",
+            port=3306
+    ) 
         cursor = conn.cursor()
 
         
@@ -280,6 +279,6 @@ class Ui_MainWindow(object):
 
         self.skinalyzer_window = SkinalyzerUI(self.current_user_id)
         self.skinalyzer_window.show()
-        self.parent().close()
+        self.widget.close()
         main_window = self.centralwidget.window()
         main_window.close()
