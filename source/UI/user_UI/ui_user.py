@@ -49,8 +49,8 @@ class SkinalyzerUI(QMainWindow):
         self.uploaded_image = None
         
         self.validator = SkinLesionValidator()
-        folder1 = r"C:\Users\user\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_1"
-        folder2 = r"C:\Users\user\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_2"
+        folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
+        folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
         self.validator.load_reference_dataset([folder1, folder2])
         
         self.init_ui()
@@ -246,7 +246,7 @@ class SkinalyzerUI(QMainWindow):
     
         right_content = QVBoxLayout()
         self.image_label2 = QLabel()
-        pixmap = QPixmap("C:\\Users\\user\\OneDrive\\Masaüstü\\skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
+        pixmap = QPixmap("C:\\Users\\Dell\\Desktop\\Skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
         self.image_label2.setPixmap(pixmap)
         self.image_label2.setMinimumWidth(500)
         self.image_label2.setScaledContents(True)
@@ -276,7 +276,7 @@ class SkinalyzerUI(QMainWindow):
         left_content = QHBoxLayout()
         icon_label = QLabel()
 
-        self.pixmap_2 = QPixmap("C:\\Users\\user\\OneDrive\Masaüstü\\skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
+        self.pixmap_2 = QPixmap("C:\\Users\\Dell\\Desktop\\skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
         icon_label.setPixmap(self.pixmap_2)
         icon_label.setStyleSheet("border:none;")
         icon_label.setFixedSize(200, 200)
@@ -398,7 +398,7 @@ class SkinalyzerUI(QMainWindow):
             header_frame.setStyleSheet("background-color: #8a4a64; border-radius: 10px 10px 0 0; border: none;")
             header_layout = QHBoxLayout(header_frame)
             
-            title_label = QLabel("Analysis Results")
+            title_label = QLabel("Analysis Confidence Results")
             title_label.setStyleSheet("color: white; font-size: 18px; font-weight: bold; border: none;")
             
             confidence_widget = QFrame()
@@ -431,7 +431,21 @@ class SkinalyzerUI(QMainWindow):
             class_frame.setStyleSheet(f"background-color:{risk_color}; border-radius: 8px; border: none;")
             class_layout = QHBoxLayout(class_frame)
             
-            class_label = QLabel(result["predicted_class"])
+            class_names = {
+            "akiec": "Actinic Keratoses and Intraepithelial Carcinoma",
+            "bcc":   "Basal Cell Carcinoma",
+            "bkl":   "Benign Keratosis-like Lesions",
+            "df":    "Dermatofibroma",
+            "mel":   "Melanoma",
+            "nv":    "Melanocytic Nevi",
+            "vasc":  "Vascular Lesions"
+        }
+
+            predicted_class = result['predicted_class'] 
+            full_class_name = class_names.get(predicted_class, "Unknown Class")
+
+            class_label = QLabel(full_class_name)
+
             if "low" in result["risk_level"].lower():
                 class_label.setStyleSheet(f"color: #4CAF50; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
             elif "medium" in result["risk_level"].lower():

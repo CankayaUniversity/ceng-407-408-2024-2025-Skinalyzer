@@ -96,7 +96,16 @@ class Ui_MainWindow(object):
 
         self.loginButton = QPushButton(self.widget)
         self.loginButton.setObjectName(u"loginButton")
-        self.loginButton.setStyleSheet(u"background-color: rgb(157, 81, 113);")
+        self.loginButton.setStyleSheet("""
+        QPushButton {
+        background-color: rgb(157, 81, 113);
+        color: white;
+        border-radius: 10px; 
+        }
+        QPushButton:hover {
+        background-color: #C06C94; 
+    }
+""")
         self.loginButton.setText("Login")
         self.loginButton.setFixedWidth(200)
         self.loginButton.setFixedHeight(60)
