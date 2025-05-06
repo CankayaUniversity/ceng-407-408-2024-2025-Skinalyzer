@@ -43,9 +43,9 @@ class Ui_MainWindow(object):
         self.label_2 = QLabel(self.widget)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setStyleSheet(u"color: rgb(0, 0, 0);")
-        self.label_2.setText("E-mail/Phone Number:")
+        self.label_2.setText("E-mail:")
         layout.addWidget(self.label_2)
-
+        
         
         self.email = QLineEdit(self.widget)
         self.email.setObjectName(u"email")
@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
         self.label_4 = QLabel(self.widget)
         self.label_4.setObjectName(u"label_4")
         self.label_4.setStyleSheet(u"color: rgb(34, 34, 34);")
-        self.label_4.setText("Don't have an account? Register")
+        self.label_4.setText("Don't have an account? <span style='color: rgb(157, 81, 113); font-weight: bold;'>Register</span>")
         
         label_4_layout = QHBoxLayout()
         label_4_layout.setAlignment(Qt.AlignCenter)  
@@ -291,3 +291,10 @@ class Ui_MainWindow(object):
         self.widget.close()
         main_window = self.centralwidget.window()
         main_window.close()
+
+
+
+
+
+
+        

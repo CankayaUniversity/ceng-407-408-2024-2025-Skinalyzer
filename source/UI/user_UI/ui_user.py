@@ -49,8 +49,8 @@ class SkinalyzerUI(QMainWindow):
         self.uploaded_image = None
         
         self.validator = SkinLesionValidator()
-        folder1 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_1"
-        folder2 = r"C:\Users\Dell\Desktop\ham10000_dataset\HAM10000_images_part_2"
+        folder1 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_1"
+        folder2 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_2"
         self.validator.load_reference_dataset([folder1, folder2])
         
         self.init_ui()
@@ -246,7 +246,7 @@ class SkinalyzerUI(QMainWindow):
     
         right_content = QVBoxLayout()
         self.image_label2 = QLabel()
-        pixmap = QPixmap("C:\\Users\\Dell\\Desktop\\Skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
+        pixmap = QPixmap("C:\\Users\\Emrehan\\Desktop\\Skinalyzer (Bitirme Projesi)\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
         self.image_label2.setPixmap(pixmap)
         self.image_label2.setMinimumWidth(500)
         self.image_label2.setScaledContents(True)
@@ -276,7 +276,7 @@ class SkinalyzerUI(QMainWindow):
         left_content = QHBoxLayout()
         icon_label = QLabel()
 
-        self.pixmap_2 = QPixmap("C:\\Users\\Dell\\Desktop\\skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
+        self.pixmap_2 = QPixmap("C:\\Users\\Emrehan\\Desktop\\Skinalyzer (Bitirme Projesi)\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
         icon_label.setPixmap(self.pixmap_2)
         icon_label.setStyleSheet("border:none;")
         icon_label.setFixedSize(200, 200)
