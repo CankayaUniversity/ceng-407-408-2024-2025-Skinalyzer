@@ -14,7 +14,7 @@ class Ui_RegisterWindow(object):
         email = self.r_email.text().strip()  
         password = self.password.text().strip()
         confirm_password = self.confirm_pass.text().strip()
-        skin_color = self.skinColor.text().strip()
+        skin_color = self.skinColor.currentText().strip()
 
         if not full_name or not user_name or not email or not password or not confirm_password:
             self.show_error("Please fill in all fields!")
@@ -39,11 +39,12 @@ class Ui_RegisterWindow(object):
 
         try:
             conn = mysql.connector.connect(
-                host="localhost",
-                user="root",
-                password="Tprksu.001",
-                database="user_database"
-            )
+            host="mydatabase.c9y4kwss4q2e.eu-north-1.rds.amazonaws.com",
+            user="bilgesufindik",
+            password="Topraksu.01",
+            database="mydatabase",
+            port=3306
+        )
             cursor = conn.cursor()
 
             cursor.execute("SELECT Email FROM user WHERE Email = %s", (email,))
@@ -271,6 +272,7 @@ class Ui_RegisterWindow(object):
         self.label_7.setText("Select Your skin color:")
         self.back_login.setText("Yes I have an account? Login")
         self.registerButton.setText("Register")
+      
 
 
     def back_to_login(self):
