@@ -438,7 +438,8 @@ class SkinalyzerUI(QMainWindow):
             "df":    "Dermatofibroma",
             "mel":   "Melanoma",
             "nv":    "Melanocytic Nevi",
-            "vasc":  "Vascular Lesions"
+            "vasc":  "Vascular Lesions",
+            "scc": "Squamous Cell Carcinoma"
         }
 
             predicted_class = result['predicted_class'] 
