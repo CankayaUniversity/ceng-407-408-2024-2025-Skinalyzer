@@ -12,9 +12,9 @@ from sklearn.preprocessing import LabelEncoder
 from collections import Counter
 import flwr as fl
 import argparse
-import traceback  # Added for detailed error reporting
+import traceback  
 
-# Kaçıncı turdan sonra ISIC2019'a geçilsin
+
 THRESHOLD = 4
 
 
@@ -94,15 +94,9 @@ def load_images_from_df(df, num_classes):
     return np.array(imgs), to_categorical(labels, num_classes=num_classes)
 
 def preprocess_ham10000(client_id=0, total_clients=3):
-<<<<<<< HEAD
-    meta = pd.read_csv(r"C:\Users\user\OneDrive\Masaüstü\ham10000_dataset\HAM10000_metadata.csv")
-    folder1 = r"C:\Users\user\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_1"
-    folder2 = r"C:\Users\user\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_2"
-=======
     meta = pd.read_csv(r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_metadata.csv")
     folder1 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_1"
     folder2 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_2"
->>>>>>> e528ab0a933671c4198cd81a5d26630c0db4e086
     meta["image_path"] = meta["image_id"].apply(lambda x: get_image_path(x, folder1, folder2))
     le = LabelEncoder()
     meta["dx"] = le.fit_transform(meta["dx"])
@@ -131,11 +125,7 @@ def preprocess_ham10000(client_id=0, total_clients=3):
 
 # ------------ ISIC2019 Ön İşleme ------------
 def preprocess_isic2019(client_id=0, total_clients=3):
-<<<<<<< HEAD
-    base = r"C:\Users\user\OneDrive\Masaüstü\ISIC2019\data"
-=======
     base = r"C:\Users\Emrehan\Desktop\ISIC2019\data"
->>>>>>> e528ab0a933671c4198cd81a5d26630c0db4e086
     splits = ["train", "valid", "test"]
     dfs = {}
 
@@ -315,19 +305,10 @@ def expand_model_output(model, new_classes):
     
     print("Genişletme sonrası model katmanları:")
     for i, layer in enumerate(new_model.layers):
-<<<<<<< HEAD
-
-        print(f"Katman {i}: {layer.name}, Çıkış şekli: {layer.output_shape}")
-
-    new_model.build(input_shape=(None, 128,128,3))
-    return new_model
-
-=======
         print(f"Katman {i}: {layer.name}, Çıkış şekli: {layer.output_shape}")
     
     return new_model
 
->>>>>>> e528ab0a933671c4198cd81a5d26630c0db4e086
 # ------------ Federated Client ------------
 class IncrementalHAMClient(fl.client.NumPyClient):
     def __init__(self, client_id=0, total_clients=3):
@@ -341,11 +322,7 @@ class IncrementalHAMClient(fl.client.NumPyClient):
         
         # Eğitim parametreleri
         self.use_early_stopping = True
-<<<<<<< HEAD
-        self.batch_size = 8  # 32'den 16'ya düşürüldü - daha iyi genelleme için
-=======
         self.batch_size = 16  # 32'den 16'ya düşürüldü - daha iyi genelleme için
->>>>>>> e528ab0a933671c4198cd81a5d26630c0db4e086
         self.current_round = 0
         
         # Model boyutu takibi
@@ -374,7 +351,7 @@ class IncrementalHAMClient(fl.client.NumPyClient):
             param_model_shape = HAM_CLASSES
         
         # ISIC verisini yükle ve model genişletme
-        if self.current_round >= THRESHOLD and not self.model_expanded:
+        if self.current_round > THRESHOLD and not self.model_expanded:
             print(f"Client-{self.client_id}: ISIC entegrasyonu için THRESHOLD değeri aşıldı.")
             
             # ISIC verilerini yükle
@@ -477,11 +454,9 @@ class IncrementalHAMClient(fl.client.NumPyClient):
         if self.model_expanded:
             # HAM ve ISIC verilerini birleştir
             x_train = np.concatenate([self.x_h, self.x_i], axis=0)
-            y_train = np.concatenate([
-                np.pad(self.y_h, ((0, 0), (0, ISIC_CLASSES - HAM_CLASSES))),  # HAM etiketlerini genişlet
-                self.y_i  # ISIC etiketleri zaten doğru boyutta
-            ], axis=0)
-            
+            padded_y_h = np.zeros((self.y_h.shape[0], ISIC_CLASSES))
+            padded_y_h[:, :HAM_CLASSES] = self.y_h
+            y_train = np.concatenate([padded_y_h, self.y_i], axis=0)
             x_val = np.concatenate([self.x_v, self.x_vi], axis=0)
             y_val = np.concatenate([
                 np.pad(self.y_v, ((0, 0), (0, ISIC_CLASSES - HAM_CLASSES))),
@@ -521,12 +496,7 @@ class IncrementalHAMClient(fl.client.NumPyClient):
             epochs=10,  # Maksimum epoch sayısı
             batch_size=self.batch_size,
             callbacks=callbacks,
-<<<<<<< HEAD
-            verbose=1,
-            shuffle="batch",
-=======
             verbose=1
->>>>>>> e528ab0a933671c4198cd81a5d26630c0db4e086
         )
         
         # Son validation metrikleri
@@ -567,10 +537,9 @@ class IncrementalHAMClient(fl.client.NumPyClient):
         if self.model_expanded:
             # Test verilerini birleştir
             x_test = np.concatenate([self.x_t, self.x_ti], axis=0)
-            y_test = np.concatenate([
-                np.pad(self.y_t, ((0, 0), (0, ISIC_CLASSES - HAM_CLASSES))),
-                self.y_ti
-            ], axis=0)
+            padded_y_t = np.zeros((self.y_t.shape[0], ISIC_CLASSES))
+            padded_y_t[:, :HAM_CLASSES] = self.y_t
+            y_test = np.concatenate([padded_y_t, self.y_ti], axis=0)
         else:
             # Sadece HAM test verisi
             x_test, y_test = self.x_t, self.y_t
@@ -583,15 +552,9 @@ class IncrementalHAMClient(fl.client.NumPyClient):
 # ------------ Ana Uygulama ------------
 def main():
     parser = argparse.ArgumentParser(description="Federated Learning Client")
-<<<<<<< HEAD
-    parser.add_argument("--client_id", type=int, default=2, help="Client ID (0, 1, 2, ...)")
-    parser.add_argument("--total_clients", type=int, default=3, help="Total number of clients")
-    parser.add_argument("--server", type=str, default="25.58.175.200:8080", help="Server address")
-=======
     parser.add_argument("--client_id", type=int, default=1, help="Client ID (0, 1, 2, ...)")
     parser.add_argument("--total_clients", type=int, default=3, help="Total number of clients")
     parser.add_argument("--server", type=str, default="25.58.175.200:8080", help="Server address") # localhost:8080
->>>>>>> e528ab0a933671c4198cd81a5d26630c0db4e086
     args = parser.parse_args()
     
     print(f"Client {args.client_id} başlatılıyor...")
