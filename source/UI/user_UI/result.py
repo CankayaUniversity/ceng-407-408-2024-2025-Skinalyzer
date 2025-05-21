@@ -153,16 +153,20 @@ class AnalysisResultsWindow(QWidget):
         risk_color = self.get_risk_color(res['risk_level'])
         risk_label = QLabel(f"<span style='color:{risk_color}; font-weight:bold;'>Risk Level: {res['risk_level']}</span>")
  
-        confidence_label = QLabel(f"<span style='color:#7F8C8D;'>Confidence:</span> %{res['confidence']}")
+        # Format confidence with proper decimal point
+        confidence_value = res['confidence']
+        if isinstance(confidence_value, (int, float)):
+            confidence_str = f"{confidence_value:.2f}"
+        else:
+            confidence_str = str(confidence_value)
+        confidence_label = QLabel(f"<span style='color:#7F8C8D;'>Confidence:</span> %{confidence_str}")
 
-        description_label = QLabel(f"<span style='color:#7F8C8D;'>Description:</span> {res['description']}")
-        description_label.setWordWrap(True)
+        # Remove the description label completely - hide from the main results view
 
         info_layout.addWidget(date_label)
         info_layout.addWidget(predicted_class)
         info_layout.addWidget(risk_label)
         info_layout.addWidget(confidence_label)
-        info_layout.addWidget(description_label)
         info_layout.addStretch()
 
         detail_button = QPushButton("Show Details")
@@ -231,7 +235,7 @@ class AnalysisResultsWindow(QWidget):
                 result = {
                     "image_path": row[0],
                     "predicted_class": row[1],
-                    "confidence": round(row[2] * 100, 2),
+                    "confidence": row[2],  
                     "risk_level": row[3],
                     "description": row[4],
                     "date": row[5].strftime("%Y-%m-%d %H:%M")

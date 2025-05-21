@@ -49,8 +49,8 @@ class SkinalyzerUI(QMainWindow):
         self.uploaded_image = None
         
         self.validator = SkinLesionValidator()
-        folder1 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_1"
-        folder2 = r"C:\Users\Emrehan\Desktop\ham10000_dataset\HAM10000_images_part_2"
+        folder1 = r"C:\Users\user\Desktop\ham10000_dataset\HAM10000_images_part_1"
+        folder2 = r"C:\Users\user\Desktop\ham10000_dataset\HAM10000_images_part_2"
         self.validator.load_reference_dataset([folder1, folder2])
         
         self.init_ui()
@@ -94,8 +94,8 @@ class SkinalyzerUI(QMainWindow):
       
         logo_layout = QHBoxLayout()
         logo = QLabel()
-        logo.setFixedSize(40, 40)
-        logo.setStyleSheet("background-color: #ffffff; border-radius: 20px;")
+        logo.setFixedSize(60, 60)
+        logo.setStyleSheet("background-color: #8a4a64 border-radius: 20px;")
         logo_layout.addWidget(logo)
         
         title = QLabel("SKINALYZER")
@@ -246,7 +246,7 @@ class SkinalyzerUI(QMainWindow):
     
         right_content = QVBoxLayout()
         self.image_label2 = QLabel()
-        pixmap = QPixmap("C:\\Users\\Emrehan\\Desktop\\Skinalyzer (Bitirme Projesi)\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
+        pixmap = QPixmap("C:\\Users\\user\\Desktop\\Skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
         self.image_label2.setPixmap(pixmap)
         self.image_label2.setMinimumWidth(500)
         self.image_label2.setScaledContents(True)
@@ -276,7 +276,7 @@ class SkinalyzerUI(QMainWindow):
         left_content = QHBoxLayout()
         icon_label = QLabel()
 
-        self.pixmap_2 = QPixmap("C:\\Users\\Emrehan\\Desktop\\Skinalyzer (Bitirme Projesi)\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
+        self.pixmap_2 = QPixmap("C:\\Users\\user\\Desktop\\Skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
         icon_label.setPixmap(self.pixmap_2)
         icon_label.setStyleSheet("border:none;")
         icon_label.setFixedSize(200, 200)
@@ -764,10 +764,10 @@ class SkinalyzerUI(QMainWindow):
 
     def log_out(self):
         """Shows a confirmation dialog for logging out"""
-        logout_dialog = QDialog(self)
-        logout_dialog.setWindowTitle("Log Out")
-        logout_dialog.setFixedSize(450, 250)
-        logout_dialog.setStyleSheet("""
+        self.logout_dialog = QDialog(self)
+        self.logout_dialog.setWindowTitle("Log Out")
+        self.logout_dialog.setFixedSize(450, 250)
+        self.logout_dialog.setStyleSheet("""
             QDialog {
                 background-color: #F8EBF4;
                 color: #2C3E50;
@@ -775,7 +775,7 @@ class SkinalyzerUI(QMainWindow):
             }
         """)
         
-        layout = QVBoxLayout(logout_dialog)
+        layout = QVBoxLayout(self.logout_dialog)
         layout.setContentsMargins(30, 30, 30, 30)
         layout.setSpacing(20)
 
@@ -796,7 +796,7 @@ class SkinalyzerUI(QMainWindow):
 
         button_layout = QHBoxLayout()
         button_layout.setSpacing(15)
- 
+
         yes_btn = QPushButton("Yes")
         yes_btn.setFixedWidth(100)
         yes_btn.setCursor(Qt.PointingHandCursor)
@@ -837,7 +837,7 @@ class SkinalyzerUI(QMainWindow):
                 background-color: #596566;
             }
         """)
-        no_btn.clicked.connect(logout_dialog.reject)    
+        no_btn.clicked.connect(self.logout_dialog.reject)    
         
         button_layout.addStretch()
         button_layout.addWidget(yes_btn)
@@ -849,14 +849,15 @@ class SkinalyzerUI(QMainWindow):
         layout.addStretch()
         layout.addLayout(button_layout)
         
-        logout_dialog.exec()
-
-
+        self.logout_dialog.exec()
 
     def go_to_login(self):
+
+        self.logout_dialog.accept()
         from login_main import MainWindow
         self.login_window = MainWindow()
         self.login_window.show()
+        
         self.close()
 
     
