@@ -1,21 +1,23 @@
 import sys
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                               QHBoxLayout, QPushButton, QLabel, QFrame, QFileDialog,
-                              QScrollArea, QSizePolicy)
+                              QScrollArea, QSizePolicy,QDialog)
 from PySide6.QtGui import QPixmap, QFont, QIcon, QColor, QImage
 from PySide6.QtCore import Qt, QSize
 import mysql.connector
 from result import AnalysisResultsWindow
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from login_main import MainWindow  
 
-# Validator modülünü içe aktarın
-from skin_lesion_validator import SkinLesionValidator
+from skin_lesion_validator import SkinLesionValidator 
 
 class SkinalyzerUI(QMainWindow):
     def __init__(self,user_id):
         super().__init__()
         self.user_id = user_id
         self.setWindowTitle("SKINALYZER")
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(1200, 600)
         
         self.setStyleSheet("""
             QMainWindow {
@@ -46,10 +48,9 @@ class SkinalyzerUI(QMainWindow):
         
         self.uploaded_image = None
         
-        # Validator'ü başlat ve referans veri setini yükle
         self.validator = SkinLesionValidator()
-        folder1 = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_1"
-        folder2 = r"C:\Users\bilge\OneDrive\Masaüstü\ham10000_dataset\HAM10000_images_part_2"
+        folder1 = r"C:\Users\user\Desktop\ham10000_dataset\HAM10000_images_part_1"
+        folder2 = r"C:\Users\user\Desktop\ham10000_dataset\HAM10000_images_part_2"
         self.validator.load_reference_dataset([folder1, folder2])
         
         self.init_ui()
@@ -93,8 +94,8 @@ class SkinalyzerUI(QMainWindow):
       
         logo_layout = QHBoxLayout()
         logo = QLabel()
-        logo.setFixedSize(40, 40)
-        logo.setStyleSheet("background-color: #ffffff; border-radius: 20px;")
+        logo.setFixedSize(60, 60)
+        logo.setStyleSheet("background-color: #8a4a64 border-radius: 20px;")
         logo_layout.addWidget(logo)
         
         title = QLabel("SKINALYZER")
@@ -104,11 +105,11 @@ class SkinalyzerUI(QMainWindow):
         menu_layout = QHBoxLayout()
         about_btn = QPushButton("about us")
         contact_btn = QPushButton("contact")
-        profile_btn = QPushButton("profile")
+        profile_btn = QPushButton("log out")
         
         about_btn.clicked.connect(self.show_about)
         contact_btn.clicked.connect(self.show_contact)
-        profile_btn.clicked.connect(self.show_profile)
+        profile_btn.clicked.connect(self.log_out)
         
         for btn in [about_btn, contact_btn, profile_btn]:
             btn.setStyleSheet("""
@@ -152,6 +153,8 @@ class SkinalyzerUI(QMainWindow):
             QFrame {
                 background-color: white;
                 border-radius: 15px;
+                border:1px solid #A0A0A0;   
+                color:black;                    
             }
         """)
         
@@ -161,10 +164,10 @@ class SkinalyzerUI(QMainWindow):
         
         title_label = QLabel("SKINALYZER")
         title_label.setAlignment(Qt.AlignCenter)
-        title_label.setStyleSheet("font-size: 18px; font-weight: bold; color: black;")
+        title_label.setStyleSheet("font-size: 18px; font-weight: bold; color: black; border:none;")
         
         subtitle_label = QLabel("Skinalyzer: AI-Based Skin Cancer Detection System")
-        subtitle_label.setStyleSheet("font-size: 17px; font-weight: bold; color: black;")
+        subtitle_label.setStyleSheet("font-size: 17px; font-weight: bold; color: black; border:none;")
         subtitle_label.setWordWrap(True)
         
         description_label = QLabel(
@@ -173,10 +176,10 @@ class SkinalyzerUI(QMainWindow):
             "innovative artificial intelligence (AI) skin technology."
         )
         description_label.setWordWrap(True)
-        description_label.setStyleSheet("font-size: 14px; margin-top: 15px; color: black;")
+        description_label.setStyleSheet("font-size: 14px; margin-top: 15px; color: black; border:none;")
         
         warning_label = QLabel("Make sure to consult your doctor without delay.")
-        warning_label.setStyleSheet("font-size: 14px; margin-top: 15px; color: black;")
+        warning_label.setStyleSheet("font-size: 14px; margin-top: 15px; color: black; border:none;")
         
         upload_button = QPushButton("UPLOAD PHOTO")
         upload_button.setStyleSheet("""
@@ -191,13 +194,16 @@ class SkinalyzerUI(QMainWindow):
                 background-color: #d0d0d0;
             }
         """)
+        upload_button.setFixedWidth(350)
+        upload_button.setFixedHeight(60)
         upload_button.clicked.connect(self.browse_image)
         
         self.image_label = QLabel()
-        self.image_label.setScaledContents(True)
-        self.image_label.setAlignment(Qt.AlignCenter)
+        self.image_label.setStyleSheet("background-color:transparent; border-radius: 10px; border: 1px solid #A0A0A0;")
         self.image_label.setMinimumSize(300, 250)
+        self.image_label.setAlignment(Qt.AlignCenter)
         self.image_label.setMaximumSize(200, 200)
+        left_content.setSpacing(20)
         
         self.analyze_button = QPushButton("ANALYZE")
         self.analyze_button.setStyleSheet("""
@@ -218,35 +224,41 @@ class SkinalyzerUI(QMainWindow):
         """)
         self.analyze_button.setEnabled(False)
         self.analyze_button.clicked.connect(self.analyze_image)
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(upload_button, alignment=Qt.AlignCenter)
         
         left_content.addWidget(title_label)
         left_content.addWidget(subtitle_label)
         left_content.addWidget(description_label)
         left_content.addWidget(warning_label)
         left_content.addSpacing(20)
-        left_content.addWidget(upload_button)
-        left_content.addWidget(self.image_label)
+        left_content.addLayout(button_layout)
+        left_content.addWidget(self.image_label, alignment=Qt.AlignCenter)
         left_content.addSpacing(10)
-        left_content.addWidget(self.analyze_button)
+        left_content.addWidget(self.analyze_button, alignment=Qt.AlignCenter)
+        left_content.addStretch()
         
-        # Layout for displaying analysis results
         self.results_layout = QVBoxLayout()
         left_content.addLayout(self.results_layout)
         left_content.addStretch()
         
-        # Right side content (e.g. a static image)
+    
         right_content = QVBoxLayout()
         self.image_label2 = QLabel()
-        pixmap = QPixmap("C:\\Users\\user\\OneDrive\\Masaüstü\\Ekran görüntüsü 2025-03-10 212056.png")
+        pixmap = QPixmap("C:\\Users\\user\\Desktop\\Skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\mainpage_static_img.png")
         self.image_label2.setPixmap(pixmap)
+        self.image_label2.setMinimumWidth(500)
         self.image_label2.setScaledContents(True)
         right_content.addWidget(self.image_label2)
         right_content.addSpacing(10)
         right_content.addStretch()
-        
+
+
         card_layout.addLayout(left_content, 1)
         card_layout.addLayout(right_content, 1)
         return card
+    
 
     def create_history_card(self):
         card = QFrame()
@@ -254,28 +266,29 @@ class SkinalyzerUI(QMainWindow):
             QFrame {
                 background-color: white;
                 border-radius: 15px;
+                border:1px solid #A0A0A0; 
             }
         """)
         
         card_layout = QHBoxLayout(card)
         card_layout.setContentsMargins(30, 30, 30, 30)
         
+        left_content = QHBoxLayout()
         icon_label = QLabel()
-        icon_label.setFixedSize(150, 150)
+
+        self.pixmap_2 = QPixmap("C:\\Users\\user\\Desktop\\Skinalyzer\\ceng-407-408-2024-2025-Skinalyzer\\images\\pastresult_logo.jpg")
+        icon_label.setPixmap(self.pixmap_2)
+        icon_label.setStyleSheet("border:none;")
+        icon_label.setFixedSize(200, 200)
         icon_label.setAlignment(Qt.AlignCenter)
-        icon_label.setStyleSheet("""
-            background-color: #8a4a64;
-            color: white;
-            font-size: 14px;
-            border-radius: 10px;
-        """)
-        icon_label.setText("History\nIcon")
+
+        left_content.addWidget(icon_label)
         
         right_content = QVBoxLayout()
         right_content.setSpacing(0)
         
         text_label = QLabel("You can access your saved analyse history by clicking the button below.")
-        text_label.setStyleSheet("font-size: 17px; color: black;")
+        text_label.setStyleSheet("font-size: 17px; color: black; border:none;")
         text_label.setAlignment(Qt.AlignCenter)
         
         show_button = QPushButton("SHOW PAST RESULTS")
@@ -328,7 +341,7 @@ class SkinalyzerUI(QMainWindow):
     
     def analyze_image(self):
         if self.uploaded_image:
-            # Show the uploaded image
+            
             self.image_label.setPixmap(QPixmap(self.uploaded_image).scaled(
                 300, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation
             ))
@@ -336,89 +349,245 @@ class SkinalyzerUI(QMainWindow):
                 background-color: transparent; 
                 border: 2px solid #4CAF50;
                 border-radius: 10px;
+                margin-bottom: 20px;
             """)
-            # Display "Analyzing..." message
-            self.analyzing_label = QLabel("Analyzing...")
-            self.analyzing_label.setStyleSheet("font-size: 16px; font-weight: bold; color: red;")
-            self.results_layout.addWidget(self.analyzing_label)
+            
+            self.clear_results_layout()
+            
+            self.analyze_button.setEnabled(False)
+            self.analyze_button.setText("Analyzing...")
+            
             QApplication.processEvents()
             
-            # İlk olarak validator ile cilt lezyonu olup olmadığını kontrol et
             is_valid, similarity, validation_message = self.validator.is_skin_lesion(self.uploaded_image)
             if not is_valid:
-                self.results_layout.removeWidget(self.analyzing_label)
-                self.analyzing_label.deleteLater()
-                self.analyzing_label = None
-                error_label = QLabel(validation_message)
-                error_label.setStyleSheet("color: red; font-weight: bold;")
-                self.results_layout.addWidget(error_label)
+                self.clear_results_layout()
+                error_frame = self.create_result_frame("Error", validation_message, "error")
+                self.results_layout.addWidget(error_frame)
+                self.analyze_button.setText("ANALYZE")
+                self.analyze_button.setEnabled(True)
                 return
             
-            # Eğer validator uygunluk onayı verdiyse, predict_model çalıştır
             from predict_model import predict_model as run_prediction
             try:
                 result = run_prediction(self.uploaded_image)
+                
                 save_result_to_db(self.user_id, self.uploaded_image, result["predicted_class"],
-                  result["confidence"], result["risk_level"], result["lesion_description"])
-
+                    result["confidence"], result["risk_level"], result["lesion_description"])
+                    
             except Exception as e:
-                error_label = QLabel("Model error: " + str(e))
-                self.results_layout.addWidget(error_label)
-                self.results_layout.removeWidget(self.analyzing_label)
-                self.analyzing_label.deleteLater()
-                self.analyzing_label = None
+                self.clear_results_layout()
+                error_frame = self.create_result_frame("Error", f"Model error: {str(e)}", "error")
+                self.results_layout.addWidget(error_frame)
+                self.analyze_button.setText("ANALYZE")
+                self.analyze_button.setEnabled(True)
                 return
+            
+           
+            self.clear_results_layout()
+            self.analyze_button.setText("ANALYZE")
+            self.analyze_button.setEnabled(True)
+            
+            
+            result_container = QFrame()
+            result_container.setStyleSheet("background-color: white; border-radius: 15px; border: 1px solid #e0e0e0;")
+            result_container_layout = QVBoxLayout(result_container)
+            
+            
+            header_frame = QFrame()
+            header_frame.setStyleSheet("background-color: #8a4a64; border-radius: 10px 10px 0 0; border: none;")
+            header_layout = QHBoxLayout(header_frame)
+            
+            title_label = QLabel("Analysis Confidence Results")
+            title_label.setStyleSheet("color: white; font-size: 18px; font-weight: bold; border: none;")
+            
+            confidence_widget = QFrame()
+            confidence_widget.setStyleSheet("background-color: white; border-radius: 15px; border: none;")
+            confidence_layout = QHBoxLayout(confidence_widget)
+            confidence_label = QLabel(f"{result['confidence']:.1f}%")
+            confidence_label.setStyleSheet("color: #8a4a64; font-weight: bold; font-size: 14px; border: none;")
+            confidence_layout.addWidget(confidence_label)
+            confidence_layout.setContentsMargins(10, 5, 10, 5)
+            
+            header_layout.addWidget(title_label)
+            header_layout.addStretch()
+            header_layout.addWidget(confidence_widget)
+            
+            
+            content_frame = QFrame()
+            content_frame.setStyleSheet("border: none;")
+            content_layout = QVBoxLayout(content_frame)
+            
+            if "low" in result["risk_level"].lower():
+                risk_color = "#D4EDDA"  
+            elif "medium" in result["risk_level"].lower():
+                risk_color = "#FFECB3"  
+            elif "high" in result["risk_level"].lower():
+                risk_color = "#FFCDD2"  
+            else:
+                risk_color = "#757575"  
+                
+            class_frame = QFrame()
+            class_frame.setStyleSheet(f"background-color:{risk_color}; border-radius: 8px; border: none;")
+            class_layout = QHBoxLayout(class_frame)
+            
+            class_names = {
+            "akiec": "Actinic Keratoses and Intraepithelial Carcinoma",
+            "bcc":   "Basal Cell Carcinoma",
+            "bkl":   "Benign Keratosis-like Lesions",
+            "df":    "Dermatofibroma",
+            "mel":   "Melanoma",
+            "nv":    "Melanocytic Nevi",
+            "vasc":  "Vascular Lesions",
+            "scc": "Squamous Cell Carcinoma"
+        }
 
-            # Extract prediction results
-            predicted_class = result["predicted_class"]
-            confidence = result["confidence"]
-            risk_level = result["risk_level"]
-            lesion_description = result["lesion_description"]
+            predicted_class = result['predicted_class'] 
+            full_class_name = class_names.get(predicted_class, "Unknown Class")
 
-            # Remove "Analyzing..." message and clear previous results
-            self.results_layout.removeWidget(self.analyzing_label)
-            self.analyzing_label.deleteLater()
-            self.analyzing_label = None
+            class_label = QLabel(full_class_name)
 
-            while self.results_layout.count() > 0:
-                item = self.results_layout.takeAt(0)
-                widget = item.widget()
-                if widget is not None:
-                    widget.deleteLater()
+            if "low" in result["risk_level"].lower():
+                class_label.setStyleSheet(f"color: #4CAF50; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+            elif "medium" in result["risk_level"].lower():
+                class_label.setStyleSheet(f"color: #FF9800; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+            elif "high" in result["risk_level"].lower():
+                class_label.setStyleSheet(f"color:#F44336; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+            else:
+                class_label.setStyleSheet(f"color: white; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+                        
+            risk_label = QLabel(result["risk_level"])
+            if "low" in result["risk_level"].lower():
+                risk_label.setStyleSheet(f"color: #4CAF50; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+            elif "medium" in result["risk_level"].lower():
+                risk_label.setStyleSheet(f"color: #FF9800; background-color: transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+            elif "high" in result["risk_level"].lower():
+                risk_label.setStyleSheet(f"color: #F44336; background-color:transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+            else:
+                risk_label.setStyleSheet(f"color: white; background-color:transparent; font-weight: bold; padding: 3px 8px; border-radius: 4px;")
+                        
+            class_layout.addWidget(class_label)
+            class_layout.addStretch()
+            class_layout.addWidget(risk_label)
+            
+           
+            description_frame = QFrame()
+            description_frame.setStyleSheet("background-color: #f5f5f5; border-radius: 8px; border: none;")
+            description_layout = QVBoxLayout(description_frame)
+            
+            description_title = QLabel("Lesion Description")
+            description_title.setStyleSheet("font-weight: bold; color: #333; border: none;")
+            
+            description_text = QLabel(result["lesion_description"])
+            description_text.setStyleSheet("color: #555; border: none;")
+            description_text.setWordWrap(True)
+            
+            description_layout.addWidget(description_title)
+            description_layout.addWidget(description_text)
+            
+            content_layout.addWidget(class_frame)
+            content_layout.addWidget(description_frame)
+            
+            note_label = QLabel("Please consult with a dermatologist for proper diagnosis.")
+            note_label.setStyleSheet("font-style: italic; color: #666; margin-top: 10px; border: none;")
+            content_layout.addWidget(note_label)
+            
+           
+            result_container_layout.addWidget(header_frame)
+            result_container_layout.addWidget(content_frame)
+            
+            button_frame = QFrame()
+            button_frame.setStyleSheet("border: none;")
+            button_layout = QHBoxLayout(button_frame)
+            
 
-            # Display the results
-            results_header = QLabel("Analysis Results")
-            results_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
-
-            class_label = QLabel("Predicted Class: " + predicted_class)
-            class_label.setStyleSheet("""
-                background-color: #e8f5e9;
-                color: #2e7d32;
-                padding: 10px;
-                border-radius: 5px;
-                font-weight: bold;
-                margin-top: 5px;
+            new_analysis_button = QPushButton("New Analysis")
+            new_analysis_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #e0e0e0;
+                    color: #333;
+                    border-radius: 8px;
+                    padding: 8px 15px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: #d0d0d0;
+                }
             """)
 
-            confidence_label = QLabel("Confidence Score: {:.2f}%".format(confidence))
-            confidence_label.setStyleSheet("margin-top: 5px;")
-
-            risk_label = QLabel("Risk Level: " + risk_level)
-            risk_label.setStyleSheet("margin-top: 5px; font-weight: bold;")
-
-            description_label = QLabel("Lesion Description: " + lesion_description)
-            description_label.setWordWrap(True)
-            description_label.setStyleSheet("margin-top: 5px;")
-
-            self.results_layout.addWidget(results_header)
-            self.results_layout.addWidget(class_label)
-            self.results_layout.addWidget(confidence_label)
-            self.results_layout.addWidget(risk_label)
-            self.results_layout.addWidget(description_label)
-
-            self.analyze_button.setText("ANALYZED")
-            self.analyze_button.setEnabled(False)
+            new_analysis_button.clicked.connect(self.reset_analysis)
+            
+            button_layout.addWidget(new_analysis_button)
+            
+            result_container_layout.addWidget(button_frame)
+            
+            self.results_layout.addWidget(result_container)
+            QApplication.processEvents()
+            scroll_area = self.findChild(QScrollArea)
+            if scroll_area:
+                scroll_area.ensureWidgetVisible(result_container)
+            
             self.add_to_history()
+
+    def save_analysis_results(self):
+        try:
+            from predict_model import predict_model as run_prediction
+            result = run_prediction(self.uploaded_image)
+
+            
+            save_result_to_db(self.user_id, self.uploaded_image, result["predicted_class"],
+                                result["confidence"], result["risk_level"], result["lesion_description"])
+
+            print("Analysis result has been saved to the database.")
+
+        except Exception as e:
+            print(f"Error saving analysis result: {e}")
+
+        
+    def clear_results_layout(self):
+        """Clear all widgets from the results layout"""
+        while self.results_layout.count() > 0:
+            item = self.results_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+                
+    def create_result_frame(self, title, message, type="info"):
+        """Create a styled frame for displaying messages"""
+        frame = QFrame()
+        
+        if type == "error":
+            frame.setStyleSheet("background-color: #FFEBEE; border-radius: 10px; padding: 10px;")
+            title_color = "#D32F2F"
+        elif type == "warning":
+            frame.setStyleSheet("background-color: #FFF8E1; border-radius: 10px; padding: 10px;")
+            title_color = "#FF8F00"
+        else:  
+            frame.setStyleSheet("background-color: #E3F2FD; border-radius: 10px; padding: 10px;")
+            title_color = "#1976D2"
+            
+        layout = QVBoxLayout(frame)
+        
+        title_label = QLabel(title)
+        title_label.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {title_color}; border: none;")
+        
+        message_label = QLabel(message)
+        message_label.setStyleSheet("color: #333; border: none;")
+        message_label.setWordWrap(True)
+        
+        layout.addWidget(title_label)
+        layout.addWidget(message_label)
+        
+        return frame
+        
+    def reset_analysis(self):
+        """Reset the analysis UI to upload new image"""
+        self.image_label.clear()
+        self.image_label.setStyleSheet("background-color: transparent; border-radius: 10px; border: 1px solid #A0A0A0;")
+        self.clear_results_layout()
+        self.analyze_button.setText("ANALYZE")
+        self.analyze_button.setEnabled(False)
+        self.uploaded_image = None
     
     def add_to_history(self):
         from datetime import datetime
@@ -458,59 +627,247 @@ class SkinalyzerUI(QMainWindow):
          self.results_window.show()
     
     def show_about(self):
-        about_frame = QFrame(self)
-        about_frame.setStyleSheet("""
-            QFrame {
-                background-color: white;
-                border-radius: 15px;
-                border: 1px solid #8a4a64;
+        """Shows the About dialog with information about the application"""
+        about_dialog = QDialog(self)
+        about_dialog.setWindowTitle("About Skinalyzer")
+        about_dialog.setFixedSize(600, 400)
+        about_dialog.setStyleSheet("""
+            QDialog {
+                background-color: #F8EBF4;
+                color: #2C3E50;
+                border-radius: 10px;
             }
         """)
-        about_frame.setGeometry(100, 100, 600, 400)
-        about_layout = QVBoxLayout(about_frame)
-        title = QLabel("About Skinalyzer")
-        title.setStyleSheet("font-size: 18px; font-weight: bold;")
-        content = QLabel(
+        
+        layout = QVBoxLayout(about_dialog)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(20)
+        
+        title_label = QLabel("About Skinalyzer")
+        title_label.setStyleSheet("""
+            font-size: 22px; 
+            font-weight: bold; 
+            color: #9D5171;
+        """)
+        title_label.setAlignment(Qt.AlignCenter)
+        
+        content_label = QLabel(
             "Skinalyzer is an AI-powered tool designed to help with the early detection "
             "of skin conditions and potential cancer indicators.\n\n"
             "Our mission is to make skin health accessible to everyone through innovative "
             "technology and artificial intelligence.\n\n"
             "Note: This is a demonstration application and not intended for medical use."
         )
-        content.setWordWrap(True)
+        content_label.setStyleSheet("""
+            font-size: 14px; 
+            color: #2C3E50;
+            line-height: 150%;
+        """)
+        content_label.setWordWrap(True)
+        content_label.setAlignment(Qt.AlignCenter)
+        
         close_btn = QPushButton("Close")
+        close_btn.setFixedWidth(120)
+        close_btn.setCursor(Qt.PointingHandCursor)
         close_btn.setStyleSheet("""
             QPushButton {
-                background-color: #8a4a64;
+                background-color: #9D5171;
                 color: white;
-                border-radius: 10px;
+                border-radius: 8px;
                 padding: 10px;
-                min-width: 100px;
                 font-weight: bold;
+                font-size: 14px;
             }
             QPushButton:hover {
+                background-color: #8a4a64;
+            }
+            QPushButton:pressed {
                 background-color: #703a50;
             }
         """)
-        close_btn.clicked.connect(about_frame.close)
-        about_layout.addWidget(title)
-        about_layout.addWidget(content)
-        about_layout.addStretch()
-        about_layout.addWidget(close_btn, 0, Qt.AlignCenter)
-        about_frame.show()
-    
+        close_btn.clicked.connect(about_dialog.accept)
+        
+        layout.addWidget(title_label)
+        layout.addWidget(content_label)
+        layout.addStretch()
+        layout.addWidget(close_btn, 0, Qt.AlignCenter)
+        
+        about_dialog.exec()
+
     def show_contact(self):
-        print("Contact clicked")
-    
-    def show_profile(self):
-        print("Profile clicked")
+        """Shows the Contact dialog with contact information"""
+        contact_dialog = QDialog(self)
+        contact_dialog.setWindowTitle("Contact Us")
+        contact_dialog.setFixedSize(600, 400)
+        contact_dialog.setStyleSheet("""
+            QDialog {
+                background-color: #F8EBF4;
+                color: #2C3E50;
+                border-radius: 10px;
+            }
+        """)
+        
+        layout = QVBoxLayout(contact_dialog)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(20)
+
+        title_label = QLabel("Contact Us")
+        title_label.setStyleSheet("""
+            font-size: 22px; 
+            font-weight: bold; 
+            color: #9D5171;
+        """)
+        title_label.setAlignment(Qt.AlignCenter)
+        
+        content_label = QLabel(
+            "For questions, feedback, or support regarding Skinalyzer:\n\n"
+            "Email: test@example.com\n"
+            "Phone: +1 (555) 555-5555\n\n"
+            "Follow us on social media for updates and skin health tips:\n"
+            "@skinalyzer"
+        )
+        content_label.setStyleSheet("""
+            font-size: 14px; 
+            color: #2C3E50;
+            line-height: 150%;
+        """)
+        content_label.setWordWrap(True)
+        content_label.setAlignment(Qt.AlignCenter)
+        
+        close_btn = QPushButton("Close")
+        close_btn.setFixedWidth(120)
+        close_btn.setCursor(Qt.PointingHandCursor)
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #9D5171;
+                color: white;
+                border-radius: 8px;
+                padding: 10px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #8a4a64;
+            }
+            QPushButton:pressed {
+                background-color: #703a50;
+            }
+        """)
+        close_btn.clicked.connect(contact_dialog.accept)
+        
+        layout.addWidget(title_label)
+        layout.addWidget(content_label)
+        layout.addStretch()
+        layout.addWidget(close_btn, 0, Qt.AlignCenter)
+        
+        contact_dialog.exec()
+
+    def log_out(self):
+        """Shows a confirmation dialog for logging out"""
+        self.logout_dialog = QDialog(self)
+        self.logout_dialog.setWindowTitle("Log Out")
+        self.logout_dialog.setFixedSize(450, 250)
+        self.logout_dialog.setStyleSheet("""
+            QDialog {
+                background-color: #F8EBF4;
+                color: #2C3E50;
+                border-radius: 10px;
+            }
+        """)
+        
+        layout = QVBoxLayout(self.logout_dialog)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(20)
+
+        question_label = QLabel("Are you sure you want to log out?")
+        question_label.setStyleSheet("""
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #9D5171;
+        """)
+        question_label.setAlignment(Qt.AlignCenter)
+
+        desc_label = QLabel("This will take you back to the login page.")
+        desc_label.setStyleSheet("""
+            font-size: 14px; 
+            color: #2C3E50;
+        """)
+        desc_label.setAlignment(Qt.AlignCenter)
+
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(15)
+
+        yes_btn = QPushButton("Yes")
+        yes_btn.setFixedWidth(100)
+        yes_btn.setCursor(Qt.PointingHandCursor)
+        yes_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #9D5171;
+                color: white;
+                border-radius: 8px;
+                padding: 10px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #8a4a64;
+            }
+            QPushButton:pressed {
+                background-color: #703a50;
+            }
+        """)
+        yes_btn.clicked.connect(self.go_to_login)
+        
+        no_btn = QPushButton("No")
+        no_btn.setFixedWidth(100)
+        no_btn.setCursor(Qt.PointingHandCursor)
+        no_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #7F8C8D;
+                color: white;
+                border-radius: 8px;
+                padding: 10px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #6C7A7A;
+            }
+            QPushButton:pressed {
+                background-color: #596566;
+            }
+        """)
+        no_btn.clicked.connect(self.logout_dialog.reject)    
+        
+        button_layout.addStretch()
+        button_layout.addWidget(yes_btn)
+        button_layout.addWidget(no_btn)
+        button_layout.addStretch()
+        
+        layout.addWidget(question_label)
+        layout.addWidget(desc_label)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+        
+        self.logout_dialog.exec()
+
+    def go_to_login(self):
+
+        self.logout_dialog.accept()
+        from login_main import MainWindow
+        self.login_window = MainWindow()
+        self.login_window.show()
+        
+        self.close()
+
     
 def save_result_to_db(user_id, image_path, predicted_class, confidence, risk_level, lesion_description):
     conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Tprksu.001",
-        database="user_database"
+        host="mydatabase.c9y4kwss4q2e.eu-north-1.rds.amazonaws.com",
+        user="bilgesufindik",
+        password="Topraksu.01",
+        database="mydatabase",
+        port=3306
     )
     cursor = conn.cursor()
 
@@ -523,6 +880,7 @@ def save_result_to_db(user_id, image_path, predicted_class, confidence, risk_lev
     conn.commit()
     cursor.close()
     conn.close()   
+    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

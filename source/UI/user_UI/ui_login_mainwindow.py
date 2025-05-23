@@ -43,9 +43,9 @@ class Ui_MainWindow(object):
         self.label_2 = QLabel(self.widget)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setStyleSheet(u"color: rgb(0, 0, 0);")
-        self.label_2.setText("E-mail/Phone Number:")
+        self.label_2.setText("E-mail:")
         layout.addWidget(self.label_2)
-
+        
         
         self.email = QLineEdit(self.widget)
         self.email.setObjectName(u"email")
@@ -57,7 +57,7 @@ class Ui_MainWindow(object):
                                  "}")
        
         self.email.setFixedWidth(350)
-        self.email.setFixedHeight(55)
+        self.email.setFixedHeight(60)
         email_layout = QHBoxLayout()
         email_layout.setAlignment(Qt.AlignCenter)  
         email_layout.addWidget(self.email)
@@ -83,7 +83,7 @@ class Ui_MainWindow(object):
                                     "}")
         
         self.password.setFixedWidth(350)
-        self.password.setFixedHeight(55)
+        self.password.setFixedHeight(60)
       
         password_layout = QHBoxLayout()
         password_layout.setAlignment(Qt.AlignCenter) 
@@ -96,7 +96,16 @@ class Ui_MainWindow(object):
 
         self.loginButton = QPushButton(self.widget)
         self.loginButton.setObjectName(u"loginButton")
-        self.loginButton.setStyleSheet(u"background-color: rgb(157, 81, 113);")
+        self.loginButton.setStyleSheet("""
+        QPushButton {
+        background-color: rgb(157, 81, 113);
+        color: white;
+        border-radius: 10px; 
+        }
+        QPushButton:hover {
+        background-color: #C06C94; 
+    }
+""")
         self.loginButton.setText("Login")
         self.loginButton.setFixedWidth(200)
         self.loginButton.setFixedHeight(60)
@@ -119,7 +128,7 @@ class Ui_MainWindow(object):
         self.label_4 = QLabel(self.widget)
         self.label_4.setObjectName(u"label_4")
         self.label_4.setStyleSheet(u"color: rgb(34, 34, 34);")
-        self.label_4.setText("Don't have an account? Register")
+        self.label_4.setText("Don't have an account? <span style='color: rgb(157, 81, 113); font-weight: bold;'>Register</span>")
         
         label_4_layout = QHBoxLayout()
         label_4_layout.setAlignment(Qt.AlignCenter)  
@@ -232,22 +241,21 @@ class Ui_MainWindow(object):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
 
     def loginfunction(self):
-        
+        self.messageLabel.setText("Loading...")
+        self.messageLabel.setStyleSheet("color: black;")
+
+        QApplication.processEvents() 
         email = self.email.text()
         password = self.password.text()
 
-
-        if email == "test@example.com" and password == "12345":
-            self.messageLabel.setText("Login successful!")
-            self.switch_to_main_page()
-
        
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="Tprksu.001",
-            database="user_database"
-        )
+            host="mydatabase.c9y4kwss4q2e.eu-north-1.rds.amazonaws.com",
+            user="bilgesufindik",
+            password="Topraksu.01",
+            database="mydatabase",
+            port=3306
+    ) 
         cursor = conn.cursor()
 
         
@@ -280,6 +288,13 @@ class Ui_MainWindow(object):
 
         self.skinalyzer_window = SkinalyzerUI(self.current_user_id)
         self.skinalyzer_window.show()
-        self.parent().close()
+        self.widget.close()
         main_window = self.centralwidget.window()
         main_window.close()
+
+
+
+
+
+
+        
